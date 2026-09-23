@@ -1,0 +1,134 @@
+{"_e":"root:init","_t":1789726028017,"format":"v0-jsonl","version":"57.0.10"}
+{"_e":"env:mode","_t":1789726028019,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1789726028024,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1789726028654,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1789726029324,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1789726029747,"plugins":[]}
+{"_e":"metro:instantiate","_t":1789726038411,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"root:init","_t":1789726234308,"format":"v0-jsonl","version":"57.0.10"}
+{"_e":"env:mode","_t":1789726234314,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1789726234335,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1789726235256,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1789726235879,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1789726236502,"plugins":[]}
+{"_e":"metro:instantiate","_t":1789726244296,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1789727050638,"id":"3","platform":"android","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1789727162360,"id":"3","total":1758,"ms":111721.508775}
+{"_e":"metro:bundling:started","_t":1789727281052,"id":"6","platform":"android","environment":null,"entry":"index.js"}
+{"_e":"metro:server_log","_t":1789727315905,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","SM-N770F - 13 - API 33","60"]}
+{"_e":"metro:bundling:done","_t":1789727370736,"id":"6","total":1790,"ms":89683.171402}
+{"_e":"metro:bundling:started","_t":1789728062220,"id":"7","platform":"android","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1789728062785,"id":"7","total":1,"ms":564.293815}
+{"_e":"metro:server_log","_t":1789728168563,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","SM-N770F - 13 - API 33","60"]}
+{"_e":"root:init","_t":1789728471474,"format":"v0-jsonl","version":"57.0.10"}
+{"_e":"env:mode","_t":1789728471476,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1789728471482,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1789728472814,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1789728473867,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1789728474900,"plugins":[]}
+{"_e":"metro:instantiate","_t":1789728495371,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1789728513291,"id":"1","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:started","_t":1789728513324,"id":"2","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1789728679834,"id":"2","total":1303,"ms":166507.692183}
+{"_e":"metro:bundling:done","_t":1789728679941,"id":"1","total":1312,"ms":166647.068234}
+{"_e":"root:init","_t":1789994556586,"format":"v0-jsonl","version":"57.0.10"}
+{"_e":"env:mode","_t":1789994556587,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1789994556590,"mode":"development","files":[],"env":{}}
+{"_e":"metro:bundling:started","_t":1789995459477,"id":"7","platform":"android","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1789995461671,"id":"7","total":1665,"ms":2194.046311}
+{"_e":"metro:server_log","_t":1789995586321,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","SM-N770F - 13 - API 33","60"]}
+{"_e":"metro:bundling:started","_t":1789995613073,"id":"9","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1789995615826,"id":"9","total":1316,"ms":2752.464249}
+{"_e":"metro:bundling:started","_t":1789995622583,"id":"a","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1789995622836,"id":"a","total":1,"ms":252.683621}
+{"_e":"metro:client_log","_t":1789995625658,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1789995625659,"level":"warn","data":["[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect."]}
+{"_e":"metro:client_log","_t":1789995625663,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1789995625663,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1789995626946,"level":"warn","data":["Image: style.resizeMode is deprecated. Please use props.resizeMode."]}
+{"_e":"metro:bundling:started","_t":1789995712594,"id":"l","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:started","_t":1789995747455,"id":"m","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1789995747596,"id":"m","total":1,"ms":140.789074}
+{"_e":"metro:client_log","_t":1789995748986,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1789995748986,"level":"warn","data":["[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect."]}
+{"_e":"metro:client_log","_t":1789995748987,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1789995748987,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1789995750009,"level":"warn","data":["Image: style.resizeMode is deprecated. Please use props.resizeMode."]}
+{"_e":"metro:bundling:started","_t":1790070009834,"id":"z","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:started","_t":1790070577082,"id":"13","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790070577424,"id":"13","total":1,"ms":341.499506}
+{"_e":"metro:bundling:started","_t":1790070734362,"id":"14","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790070734639,"id":"14","total":1,"ms":276.509281}
+{"_e":"metro:bundling:started","_t":1790070737064,"id":"15","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790070737247,"id":"15","total":1,"ms":183.370433}
+{"_e":"metro:bundling:started","_t":1790070856882,"id":"16","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790070857065,"id":"16","total":1,"ms":182.273297}
+{"_e":"metro:client_log","_t":1790070858519,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1790070858520,"level":"warn","data":["[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect."]}
+{"_e":"metro:client_log","_t":1790070858520,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1790070858520,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1790070859851,"level":"warn","data":["Image: style.resizeMode is deprecated. Please use props.resizeMode."]}
+{"_e":"metro:bundling:started","_t":1790071011278,"id":"1k","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790071011662,"id":"1k","total":1,"ms":383.639702}
+{"_e":"metro:bundling:started","_t":1790071014767,"id":"1l","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790071014960,"id":"1l","total":1,"ms":192.037893}
+{"_e":"metro:bundling:started","_t":1790071535097,"id":"1m","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790071535260,"id":"1m","total":1,"ms":162.769724}
+{"_e":"metro:client_log","_t":1790071536682,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1790071536682,"level":"warn","data":["[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect."]}
+{"_e":"metro:client_log","_t":1790071536683,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1790071536683,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1790071537562,"level":"warn","data":["Image: style.resizeMode is deprecated. Please use props.resizeMode."]}
+{"_e":"metro:bundling:started","_t":1790071590136,"id":"20","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790071590314,"id":"20","total":1,"ms":177.194609}
+{"_e":"metro:bundling:started","_t":1790071590539,"id":"21","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790071590736,"id":"21","total":1,"ms":197.452172}
+{"_e":"metro:bundling:started","_t":1790071590907,"id":"22","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790071591040,"id":"22","total":1,"ms":132.984604}
+{"_e":"metro:bundling:started","_t":1790071592190,"id":"23","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790071592302,"id":"23","total":1,"ms":111.804294}
+{"_e":"metro:client_log","_t":1790071593577,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1790071593577,"level":"warn","data":["[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect."]}
+{"_e":"metro:client_log","_t":1790071593578,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1790071593578,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1790071594393,"level":"warn","data":["Image: style.resizeMode is deprecated. Please use props.resizeMode."]}
+{"_e":"metro:bundling:started","_t":1790071647393,"id":"2h","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790071647679,"id":"2h","total":1,"ms":285.779561}
+{"_e":"metro:bundling:failed","_t":1790076517484,"id":null,"message":"SyntaxError: /home/learn2earn/Downloads/real_estate_client_handoff/src/components/TextField.js: JSX value should be either an expression or a quoted JSX text. (35:15)\n\n  33 |           secureTextEntry={secureTextEntry ? isHidden : false}\n  34 |           style={styles.input}\n> 35 |           type=email\n     |                ^\n  36 |           onFocus={(event) => {\n  37 |             setIsFocused(true);\n  38 |             onFocus?.(event);","importStack":null,"filename":"src/components/TextField.js","targetModuleName":null,"originModulePath":null}
+{"_e":"metro:client_log","_t":1790076517499,"level":"error","data":["[TransformError: SyntaxError: /home/learn2earn/Downloads/real_estate_client_handoff/src/components/TextField.js: JSX value should be either an expression or a quoted JSX text. (35:15)\n\n  33 |           secureTextEntry={secureTextEntry ? isHidden : false}\n  34 |           style={styles.input}\n> 35 |           type=email\n     |                ^\n  36 |           onFocus={(event) => {\n  37 |             setIsFocused(true);\n  38 |             onFocus?.(event);]"]}
+{"_e":"metro:bundling:failed","_t":1790076573899,"id":null,"message":"SyntaxError: /home/learn2earn/Downloads/real_estate_client_handoff/src/screens/auth/LoginScreen.js: JSX value should be either an expression or a quoted JSX text. (94:16)\n\n  92 |                 onChangeText={setEmail}\n  93 |                 value=\n> 94 |                 placeholder=\"you@example.com\"\n     |                 ^\n  95 |                 value={email}\n  96 |               />\n  97 |               <TextField","importStack":null,"filename":"src/screens/auth/LoginScreen.js","targetModuleName":null,"originModulePath":null}
+{"_e":"metro:client_log","_t":1790076573906,"level":"error","data":["[TransformError: SyntaxError: /home/learn2earn/Downloads/real_estate_client_handoff/src/screens/auth/LoginScreen.js: JSX value should be either an expression or a quoted JSX text. (94:16)\n\n  92 |                 onChangeText={setEmail}\n  93 |                 value=\n> 94 |                 placeholder=\"you@example.com\"\n     |                 ^\n  95 |                 value={email}\n  96 |               />\n  97 |               <TextField]"]}
+{"_e":"metro:bundling:started","_t":1790077340820,"id":"2i","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790077341116,"id":"2i","total":1,"ms":295.745447}
+{"_e":"metro:client_log","_t":1790078283533,"level":"error","data":["[ReferenceError: emailError is not defined]","LoginScreen@http://localhost:8081/src/screens/auth/LoginScreen.bundle//&platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable&minify=false&modulesOnly=true&runModule=false&shallow=true:134:17\nreact_stack_bottom_frame@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:19097:20\nrenderWithHooks@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:9970:40\nupdateFunctionComponent@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:11359:19\nbeginWork@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:11928:18\nrunWithFiberInDEV@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:6447:127\nperformUnitOfWork@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:14355:95\nworkLoopSync@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:14250:57\nrenderRootSync@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:14235:9\nperformWorkOnRoot@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:13908:35\nperformSyncWorkOnRoot@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:15018:24\nflushSyncWorkAcrossRoots_impl@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:14933:308\nflushSyncWork$1@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:14038:84\nscheduleRefresh@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:5860:9\nperformReactRefresh/<@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:1129:23\nperformReactRefresh@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:1121:32\nperformReactRefresh@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:884:27\nmetroHotUpdateModule/reactRefreshTimeout<@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:429:21\n","\nSceneView@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:126449:93\nrender@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:126235:59\nuseDescriptors/descriptors<@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:126267:29\nuseDescriptors@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:126264:32\nuseNavigationBuilder@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:125922:46\nNativeStackNavigator@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:129994:57\nAuthNavigator@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:129883:38\nRootNavigator@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:118456:117\nApp@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:27866:54\nWithDevTools@http://localhost:8081/index.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:25670:45"]}
+{"_e":"metro:client_log","_t":1790078283534,"level":"warn","data":["An error occurred in the <LoginScreen> component.\n\nConsider adding an error boundary to your tree to customize error handling behavior.\nVisit https://react.dev/link/error-boundaries to learn more about error boundaries.\n"]}
+{"_e":"metro:bundling:started","_t":1790078298153,"id":"2j","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790078298501,"id":"2j","total":1,"ms":347.422906}
+{"_e":"metro:client_log","_t":1790088386476,"level":"warn","data":["expo-file-system is not supported on web"]}
+{"_e":"metro:client_log","_t":1790088388917,"level":"warn","data":["expo-file-system is not supported on web"]}
+{"_e":"metro:client_log","_t":1790088432541,"level":"warn","data":["expo-file-system is not supported on web"]}
+{"_e":"metro:client_log","_t":1790091531492,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:bundling:started","_t":1790091540121,"id":"2k","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790091541060,"id":"2k","total":1,"ms":934.948214}
+{"_e":"metro:bundling:started","_t":1790091865483,"id":"2l","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790091866195,"id":"2l","total":1,"ms":712.084168}
+{"_e":"metro:bundling:started","_t":1790164372556,"id":"2m","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790164373185,"id":"2m","total":1,"ms":628.816313}
+{"_e":"metro:bundling:started","_t":1790166841542,"id":"2n","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790166841913,"id":"2n","total":1,"ms":371.13934}
+{"_e":"metro:bundling:started","_t":1790166848874,"id":"2o","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790166849126,"id":"2o","total":1,"ms":251.786793}
+{"_e":"metro:bundling:started","_t":1790177815780,"id":"2p","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790177816455,"id":"2p","total":1,"ms":671.341731}
+{"_e":"metro:bundling:started","_t":1790177816474,"id":"2q","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:done","_t":1790177816860,"id":"2q","total":1,"ms":385.631168}
+{"_e":"metro:client_log","_t":1790177818767,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1790177818767,"level":"warn","data":["[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect."]}
+{"_e":"metro:client_log","_t":1790177818768,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1790177818768,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1790177819108,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1790177819109,"level":"warn","data":["[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect."]}
+{"_e":"metro:client_log","_t":1790177819109,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1790177819109,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1790177820374,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1790177820683,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}

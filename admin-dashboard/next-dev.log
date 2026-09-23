@@ -1,0 +1,55 @@
+
+> estateflow-admin-dashboard@0.1.0 dev
+> next dev -p 3050
+
+   ▲ Next.js 15.5.22
+   - Local:        http://localhost:3050
+   - Network:      http://192.168.111.20:3050
+
+ ✓ Starting...
+ ✓ Ready in 6.9s
+ ○ Compiling / ...
+ ✓ Compiled / in 6.9s (735 modules)
+ GET / 200 in 6215ms
+ GET / 200 in 281ms
+ ✓ Compiled in 587ms (626 modules)
+ ✓ Compiled in 300ms (636 modules)
+[?25h
+
+> estateflow-admin-dashboard@0.1.0 dev
+> next dev -p 3050
+
+   ▲ Next.js 15.5.22
+   - Local:        http://localhost:3050
+   - Network:      http://192.168.111.20:3050
+
+ ✓ Starting...
+ ✓ Ready in 2.5s
+ ○ Compiling / ...
+ ✓ Compiled / in 1834ms (636 modules)
+ GET / 200 in 2403ms
+ GET / 200 in 199ms
+
+> estateflow-admin-dashboard@0.1.0 dev
+> next dev -p 3050
+
+   ▲ Next.js 15.5.22
+   - Local:        http://localhost:3050
+   - Network:      http://192.168.111.20:3050
+
+ ✓ Starting...
+ ✓ Ready in 13s
+ ○ Compiling / ...
+ ✓ Compiled / in 6s (642 modules)
+ GET / 200 in 8185ms
+ GET / 200 in 5448ms
+ ✓ Compiled in 1144ms (632 modules)
+ ✓ Compiled in 505ms (632 modules)
+ ✓ Compiled in 362ms (632 modules)
+ ✓ Compiled in 404ms (632 modules)
+ ✓ Compiled in 432ms (632 modules)
+ ✓ Compiled in 354ms (632 modules)
+ ✓ Compiled in 684ms (634 modules)
+ ✓ Compiled in 408ms (634 modules)
+ ✓ Compiled in 371ms (644 modules)
+[?25h
