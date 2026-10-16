@@ -13,6 +13,7 @@ import {
 import { AppText } from '../../components/AppText';
 import { Button } from '../../components/Button';
 import { Screen } from '../../components/Screen';
+import { getInitials } from '../../utils/format';
 import { StatusChip } from '../../components/StatusChip';
 import { colors, spacing } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
@@ -56,16 +57,6 @@ const QUICK_ACTIONS = [
     screen: 'ReportIssue',
   },
 ];
-
-function getInitials(name) {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0].toUpperCase())
-    .join('');
-}
 
 export function ResidentHomeScreen({ navigation }) {
   const { logout, user } = useAuth();

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Alert, KeyboardAvoidingView, Linking, Platform, ScrollView, StyleSheet, View } from 'react-native';
-import { SaleTag02Icon } from '@hugeicons/core-free-icons';
+import { useNavigation } from '@react-navigation/native';
+import { ChartColumnIcon, SaleTag02Icon } from '@hugeicons/core-free-icons';
 import { AppText } from '../../components/AppText';
 import { Button } from '../../components/Button';
 import { Screen } from '../../components/Screen';
@@ -11,6 +12,7 @@ import { initializeSalePayment, verifySalePayment } from '../../api/payments';
 import { spacing, colors } from '../../theme';
 
 export function SalesScreen() {
+  const navigation = useNavigation();
   const [estateId, setEstateId] = useState('');
   const [propertyId, setPropertyId] = useState('');
   const [buyerName, setBuyerName] = useState('');
@@ -53,7 +55,7 @@ export function SalesScreen() {
       const data = await createSale(estateId, {
         propertyId,
         buyerId,
-        salePrice: Number(salePrice) || 0,
+        salePrice: Number(salePrice),
         paymentStatus: 'pending',
         note: 'Sale recorded from mobile Phase 5 workflow.',
       });
@@ -124,6 +126,12 @@ export function SalesScreen() {
             <AppText variant="title">Sales workflow</AppText>
             <AppText muted>Create buyers, reservations, sales, and allocation records for an estate property.</AppText>
             {latest ? <StatusChip label={`${latest.label}: ${latest.value}`} tone={latest.tone} /> : null}
+            <Button
+              title="Open payment dashboard"
+              icon={ChartColumnIcon}
+              variant="secondary"
+              onPress={() => navigation.navigate('PaymentDashboard')}
+            />
           </View>
 
           <View style={styles.card}>

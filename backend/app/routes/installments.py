@@ -7,6 +7,7 @@ from flask import Blueprint, current_app, request
 from ..db import db_cursor
 from ..utils.audit import record_audit_log
 from ..utils.authz import require_roles
+from ..utils.notify import create_notification, queue_push
 from ..utils.paystack import PaystackError, initialize_transaction
 from ..utils.responses import error, success
 from ..utils.settings import get_buyer_transaction_fee_percent, get_seller_commission_percent
@@ -397,4 +398,37 @@ def apply_successful_installment_payment(cursor, transaction, paystack_data):
         entity_id=installment_id,
         metadata={"reference": reference, "amount": transaction["amount"]},
     )
+
+    cursor.execute(
+        """
+        SELECT e.manager_user_id
+        FROM installment_plans ip
+        JOIN estates e ON e.id = ip.estate_id
+        WHERE ip.id = %s
+        LIMIT 1
+        """,
+        (installment["plan_id"],),
+    )
+    plan_owner = cursor.fetchone()
+    if plan_owner and plan_owner.get("manager_user_id"):
+        amount_naira = float(transaction["amount"] or 0)
+        plan_completed = int(progress["total"]) == int(progress["paid_count"])
+        create_notification(
+            cursor,
+            user_id=plan_owner["manager_user_id"],
+            title="Installment payment received",
+            body=(
+                f"Installment payment of ₦{amount_naira:,.0f} confirmed."
+                + (" The installment plan is now fully paid." if plan_completed else "")
+            ),
+            type="payment",
+            entity_type="installment",
+            entity_id=installment_id,
+        )
+        queue_push(
+            [plan_owner["manager_user_id"]],
+            title="Installment payment received",
+            body=f"Installment payment of ₦{amount_naira:,.0f} confirmed.",
+            data={"type": "payment", "entityType": "installment", "entityId": installment_id},
+        )
     return True

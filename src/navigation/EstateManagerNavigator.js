@@ -14,7 +14,9 @@ import { HomeStack } from './HomeStack';
 import { ProfileStack } from './ProfileStack';
 import { EstatesScreen } from '../screens/estates/EstatesScreen';
 import { PropertiesScreen } from '../screens/estates/PropertiesScreen';
+import { PlotMapScreen } from '../screens/estates/PlotMapScreen';
 import { SalesScreen } from '../screens/sales/SalesScreen';
+import { PaymentDashboardScreen } from '../screens/sales/PaymentDashboardScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -41,7 +43,7 @@ export function EstateManagerNavigator() {
       />
       <Tab.Screen
         name="Sales"
-        component={SalesScreen}
+        component={SalesStack}
         options={{ tabBarIconRef: SaleTag02Icon, tabBarAccessibilityLabel: 'Sales' }}
       />
       <Tab.Screen
@@ -69,6 +71,16 @@ function EstatesStack() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Estates" component={EstatesScreen} />
       <Stack.Screen name="Properties" component={PropertiesScreen} />
+      <Stack.Screen name="PlotMap" component={PlotMapScreen} />
+    </Stack.Navigator>
+  );
+}
+
+function SalesStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="SalesOverview" component={SalesScreen} />
+      <Stack.Screen name="PaymentDashboard" component={PaymentDashboardScreen} />
     </Stack.Navigator>
   );
 }

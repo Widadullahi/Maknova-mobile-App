@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { fetchCurrentUser, loginUser, registerUser } from '../api/auth';
+import { deletePushToken } from '../api/notifications';
 import { onSessionExpired } from '../services/sessionEvents';
 import { clearTokens, saveTokens } from '../services/tokenStorage';
 
@@ -60,6 +61,9 @@ export function AuthProvider({ children }) {
   }
 
   async function logout() {
+    // Best-effort: drop the device push token server-side so this device stops
+    // receiving this account's pushes (must run while the token still exists).
+    await deletePushToken().catch(() => null);
     await clearTokens();
     setUser(null);
   }

@@ -10,6 +10,7 @@ from flask import Blueprint, current_app, request
 from ..db import db_cursor
 from ..utils.audit import record_audit_log
 from ..utils.authz import require_roles
+from ..utils.notify import create_notification, flush_push_queue, queue_push
 from ..utils.paystack import PaystackError, initialize_transaction, verify_transaction
 from ..utils.responses import error, success
 from ..utils.scope import get_user_estate_ids, can_access_estate
@@ -89,6 +90,10 @@ def list_payments(current_user):
 @payments_bp.get("/summary")
 @require_roles("estate_manager", "admin", "super_admin")
 def payment_summary(current_user):
+    """Payment dashboard feed: status counts, a 6-month paid-sales trend, and a
+    per-estate distribution. All scoped to the caller's estate access."""
+    TREND_MONTHS = 6
+
     with db_cursor() as cursor:
         scope_sql, params = build_estate_scope(cursor, current_user)
         cursor.execute(
@@ -106,6 +111,58 @@ def payment_summary(current_user):
         )
         rows = cursor.fetchall()
 
+        cursor.execute(
+            f"""
+            SELECT
+              DATE_FORMAT(s.created_at, '%Y-%m') AS month,
+              COUNT(*) AS count,
+              COALESCE(SUM(s.sale_price), 0) AS amount
+            FROM sales s
+            WHERE s.payment_status = 'paid'
+              AND s.created_at >= DATE_SUB(CURDATE(), INTERVAL %s MONTH)
+              {scope_sql}
+            GROUP BY month
+            ORDER BY month
+            """,
+            tuple([TREND_MONTHS, *params]),
+        )
+        trend_rows = {row["month"]: row for row in cursor.fetchall()}
+
+        cursor.execute(
+            f"""
+            SELECT
+              e.id AS estate_id,
+              e.name AS estate_name,
+              COUNT(*) AS count,
+              COALESCE(SUM(s.sale_price), 0) AS amount
+            FROM sales s
+            JOIN estates e ON e.id = s.estate_id
+            WHERE s.payment_status = 'paid'
+              {scope_sql}
+            GROUP BY e.id, e.name
+            ORDER BY amount DESC
+            LIMIT 10
+            """,
+            tuple(params),
+        )
+        by_estate = cursor.fetchall()
+
+    # Fill missing months so charts get a stable, gap-free series.
+    trend = []
+    month_cursor = datetime.utcnow().replace(day=1)
+    for _ in range(TREND_MONTHS):
+        key = month_cursor.strftime("%Y-%m")
+        row = trend_rows.get(key)
+        trend.append(
+            {
+                "month": key,
+                "count": int(row["count"]) if row else 0,
+                "amount": float(row["amount"] or 0) if row else 0.0,
+            }
+        )
+        month_cursor = (month_cursor - timedelta(days=1)).replace(day=1)
+    trend.reverse()
+
     return success(
         {
             "summary": {
@@ -118,6 +175,16 @@ def payment_summary(current_user):
                         "amount": float(row["amount"] or 0),
                     }
                     for row in rows
+                ],
+                "monthly": trend,
+                "byEstate": [
+                    {
+                        "estateId": row["estate_id"],
+                        "estateName": row["estate_name"],
+                        "count": row["count"],
+                        "amount": float(row["amount"] or 0),
+                    }
+                    for row in by_estate
                 ],
             }
         }
@@ -283,6 +350,24 @@ def apply_successful_payment(cursor, transaction, paystack_data):
     sale = cursor.fetchone()
     if sale:
         update_property_status(cursor, sale["property_id"], sale["manager_user_id"], "sold", "Full sale payment verified automatically")
+        amount_naira = float(transaction["amount"] or 0)
+        # Notify the estate manager that money actually landed. This is the
+        # server-side notification the whole workflow previously lacked.
+        create_notification(
+            cursor,
+            user_id=sale["manager_user_id"],
+            title="Payment received",
+            body=f"Payment of ₦{amount_naira:,.0f} confirmed for a plot sale. The plot is now marked sold.",
+            type="payment",
+            entity_type="sale",
+            entity_id=transaction["sale_id"],
+        )
+        queue_push(
+            [sale["manager_user_id"]],
+            title="Payment received",
+            body=f"₦{amount_naira:,.0f} payment confirmed for a plot sale.",
+            data={"type": "payment", "entityType": "sale", "entityId": transaction["sale_id"]},
+        )
     record_audit_log(
         cursor,
         None,
@@ -321,6 +406,7 @@ def verify_sale_payment(current_user, reference):
         cursor.execute("SELECT * FROM payment_transactions WHERE reference = %s LIMIT 1", (reference,))
         transaction = cursor.fetchone()
 
+    flush_push_queue()
     return success({"transaction": serialize_transaction(transaction)})
 
 
@@ -374,6 +460,7 @@ def paystack_webhook():
                     if transaction and transaction["status"] != "success":
                         apply_successful_payment(cursor, transaction, data)
 
+    flush_push_queue()
     return success({}, "Webhook received")
 
 

@@ -1,12 +1,13 @@
 import csv
 import io
 import json
+from datetime import date, timedelta
 
 from flask import Blueprint, Response, request
 
 from ..db import db_cursor
 from ..utils.authz import require_roles
-from ..utils.responses import success
+from ..utils.responses import error, success
 from ..utils.scope import get_user_estate_ids
 
 analytics_bp = Blueprint("analytics", __name__)
@@ -17,28 +18,86 @@ def count_table(cursor, table_name, where=""):
     return cursor.fetchone()["count"]
 
 
+def _parse_date_arg(value, *, end=False):
+    """Parses YYYY-MM-DD. `end=True` returns an exclusive upper bound (next day)
+    so `to=2026-10-07` includes everything that happens on Oct 7."""
+    if not value:
+        return None
+    try:
+        parsed = date.fromisoformat(value)
+    except ValueError:
+        return None
+    return parsed + timedelta(days=1) if end else parsed
+
+
 @analytics_bp.get("/summary")
 @require_roles("estate_manager", "admin", "super_admin")
 def analytics_summary(current_user):
+    """Dashboard summary. Optional filters:
+    - from/to: inclusive YYYY-MM-DD range applied to created_at of each metric.
+    - estateId: admins can narrow to one estate; non-admins can only pass one
+      of the estates they already have access to.
+    """
+    from_date = _parse_date_arg(request.args.get("from"))
+    to_date = _parse_date_arg(request.args.get("to"), end=True)
+    estate_id_param = request.args.get("estateId", type=int)
+
     with db_cursor() as cursor:
         estate_ids = get_user_estate_ids(cursor, current_user)
-        estate_filter = ""
-        estate_params = ()
+
+        if estate_ids is None:
+            # Admin: estateId filter narrows the whole dashboard to one estate.
+            if estate_id_param:
+                estate_ids = {estate_id_param}
+        elif estate_id_param:
+            if estate_id_param not in estate_ids:
+                return error("FORBIDDEN", "You cannot access analytics for this estate.", 403)
+            estate_ids = {estate_id_param}
+
+        if estate_ids is not None and not estate_ids:
+            return success({"summary": {}})
+
+        estate_in = ""
+        estate_params = []
         if estate_ids is not None:
-            if not estate_ids:
-                return success({"summary": {}})
             placeholders = ", ".join(["%s"] * len(estate_ids))
-            estate_filter = f" WHERE estate_id IN ({placeholders})"
-            estate_params = tuple(estate_ids)
+            estate_in = f"estate_id IN ({placeholders})"
+            estate_params = list(estate_ids)
+
+        date_clauses = []
+        date_params = []
+        if from_date:
+            date_clauses.append("created_at >= %s")
+            date_params.append(from_date)
+        if to_date:
+            date_clauses.append("created_at < %s")
+            date_params.append(to_date)
+
+        def filtered_where(estate_clause=True, with_dates=True):
+            clauses, params = [], []
+            if estate_clause and estate_in:
+                clauses.append(estate_in)
+                params.extend(estate_params)
+            if with_dates:
+                clauses.extend(date_clauses)
+                params.extend(date_params)
+            where = f" WHERE {' AND '.join(clauses)}" if clauses else ""
+            return where, tuple(params)
+
+        def count_filtered(table, extra="", *, estate_clause=True, with_dates=True):
+            where, params = filtered_where(estate_clause=estate_clause, with_dates=with_dates)
+            combined = f"{where} AND {extra}" if where and extra else (where or (f" WHERE {extra}" if extra else ""))
+            cursor.execute(f"SELECT COUNT(*) AS count FROM {table}{combined}", params)
+            return cursor.fetchone()["count"]
 
         summary = {
-            "users": count_table(cursor, "users"),
-            "estates": len(estate_ids) if estate_ids is not None else count_table(cursor, "estates"),
+            "users": count_filtered("users", estate_clause=False),
+            "estates": len(estate_ids) if estate_ids is not None else count_filtered("estates", estate_clause=False),
             "properties": 0,
             "availableProperties": 0,
             "soldProperties": 0,
             "allocatedProperties": 0,
-            "residents": count_table(cursor, "residents"),
+            "residents": count_filtered("residents"),
             "visitorPasses": 0,
             "maintenanceOpen": 0,
             "estateReports": 0,
@@ -47,7 +106,8 @@ def analytics_summary(current_user):
             "subscriptionRevenue": 0.0,
         }
         # Pending manager verifications. Scoped to the manager's own application
-        # for non-admin accounts; global for admins.
+        # for non-admin accounts; global for admins. Current-state metric: date
+        # filters do not apply.
         if estate_ids is None:
             summary["pendingVerifications"] = count_table(cursor, "estate_verification_applications", "WHERE status = 'pending_review'")
         else:
@@ -59,33 +119,24 @@ def analytics_summary(current_user):
         if estate_ids is None:
             summary["suspendedEstates"] = count_table(cursor, "estates", "WHERE status = 'suspended'")
         else:
-            cursor.execute(f"SELECT COUNT(*) AS count FROM estates{estate_filter} AND status = 'suspended'", estate_params)
+            cursor.execute(
+                f"SELECT COUNT(*) AS count FROM estates WHERE id IN ({placeholders}) AND status = 'suspended'",
+                tuple(estate_params),
+            )
             summary["suspendedEstates"] = cursor.fetchone()["count"]
-        if estate_ids is None:
-            summary["properties"] = count_table(cursor, "properties")
-            summary["availableProperties"] = count_table(cursor, "properties", "WHERE status = 'available'")
-            summary["soldProperties"] = count_table(cursor, "properties", "WHERE status = 'sold'")
-            summary["allocatedProperties"] = count_table(cursor, "properties", "WHERE status = 'allocated'")
-            summary["visitorPasses"] = count_table(cursor, "visitor_passes")
-            summary["maintenanceOpen"] = count_table(cursor, "maintenance_requests", "WHERE status IN ('open', 'assigned', 'in_progress')")
-            summary["estateReports"] = count_table(cursor, "estate_reports")
-        else:
-            cursor.execute(f"SELECT COUNT(*) AS count FROM properties{estate_filter}", estate_params)
-            summary["properties"] = cursor.fetchone()["count"]
-            cursor.execute(f"SELECT COUNT(*) AS count FROM properties{estate_filter} AND status = 'available'", estate_params)
-            summary["availableProperties"] = cursor.fetchone()["count"]
-            cursor.execute(f"SELECT COUNT(*) AS count FROM properties{estate_filter} AND status = 'sold'", estate_params)
-            summary["soldProperties"] = cursor.fetchone()["count"]
-            cursor.execute(f"SELECT COUNT(*) AS count FROM properties{estate_filter} AND status = 'allocated'", estate_params)
-            summary["allocatedProperties"] = cursor.fetchone()["count"]
-            cursor.execute(f"SELECT COUNT(*) AS count FROM visitor_passes{estate_filter}", estate_params)
-            summary["visitorPasses"] = cursor.fetchone()["count"]
-            cursor.execute(f"SELECT COUNT(*) AS count FROM maintenance_requests{estate_filter} AND status IN ('open', 'assigned', 'in_progress')", estate_params)
-            summary["maintenanceOpen"] = cursor.fetchone()["count"]
-            cursor.execute(f"SELECT COUNT(*) AS count FROM estate_reports{estate_filter}", estate_params)
-            summary["estateReports"] = cursor.fetchone()["count"]
 
-        cursor.execute("SELECT COALESCE(SUM(sale_price), 0) AS total FROM sales WHERE status IN ('active', 'completed')")
+        summary["properties"] = count_filtered("properties")
+        summary["availableProperties"] = count_filtered("properties", "status = 'available'")
+        summary["soldProperties"] = count_filtered("properties", "status = 'sold'")
+        summary["allocatedProperties"] = count_filtered("properties", "status = 'allocated'")
+        summary["visitorPasses"] = count_filtered("visitor_passes")
+        summary["maintenanceOpen"] = count_filtered("maintenance_requests", "status IN ('open', 'assigned', 'in_progress')")
+        summary["estateReports"] = count_filtered("estate_reports")
+
+        where, params = filtered_where()
+        sales_extra = "status IN ('active', 'completed')"
+        combined = f"{where} AND {sales_extra}" if where else f" WHERE {sales_extra}"
+        cursor.execute(f"SELECT COALESCE(SUM(sale_price), 0) AS total FROM sales{combined}", params)
         summary["salesVolume"] = float(cursor.fetchone()["total"] or 0)
 
     return success({"summary": summary})

@@ -8,6 +8,7 @@ from ..routes.auth import serialize_user
 from ..routes.verification import document_path_from_url, serialize_application, get_application_documents
 from ..utils.audit import record_audit_log
 from ..utils.authz import require_roles
+from ..utils.notify import create_notification, flush_push_queue, queue_push
 from ..utils.responses import error, success
 from ..utils.security import hash_password
 
@@ -130,10 +131,46 @@ def update_verification_status(current_user, application_id):
             """,
             (current_user["id"], "verification.status_updated", "estate_verification_application", application_id, status, admin_note),
         )
+
+        # Tell the applicant their verification outcome (Phase 11 notification
+        # triggers — the previously missing server-side notification creation).
+        status_messages = {
+            "approved": (
+                "Verification approved",
+                "Your estate verification was approved. You can now publish your estate listing.",
+            ),
+            "rejected": (
+                "Verification declined",
+                admin_note or "Your estate verification application was declined. Review the admin note and reapply.",
+            ),
+            "additional_info_required": (
+                "Additional information required",
+                admin_note or "Your verification application needs additional information. Please review and resubmit.",
+            ),
+        }
+        if status in status_messages:
+            title, body = status_messages[status]
+            create_notification(
+                cursor,
+                user_id=application["user_id"],
+                title=title,
+                body=body,
+                type="verification",
+                entity_type="verification_application",
+                entity_id=application_id,
+            )
+            queue_push(
+                [application["user_id"]],
+                title=title,
+                body=body,
+                data={"type": "verification", "entityType": "verification_application", "entityId": application_id},
+            )
+
         cursor.execute("SELECT * FROM estate_verification_applications WHERE id = %s", (application_id,))
         updated = cursor.fetchone()
         documents = get_application_documents(cursor, application_id)
 
+    flush_push_queue()
     return success({"application": serialize_application(updated, documents)}, "Verification status updated")
 
 

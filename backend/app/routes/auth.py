@@ -112,8 +112,15 @@ def login():
 
     allowed_roles = PORTAL_ALLOWED_ROLES.get(portal)
 
+    # Review finding #1: hardcoded demo accounts (demo@estate.com / demo1234)
+    # were reachable in EVERY environment. They are now gated behind
+    # DEMO_LOGIN_ENABLED (default off) so production can never log in with them.
     demo_user = DEMO_USERS_BY_EMAIL.get(email)
-    if demo_user and password == DEMO_PASSWORD:
+    if (
+        current_app.config.get("DEMO_LOGIN_ENABLED")
+        and demo_user
+        and password == DEMO_PASSWORD
+    ):
         if allowed_roles and demo_user["role"] not in allowed_roles:
             return error("FORBIDDEN", f"This account does not have access to the {portal} dashboard.", 403)
         return success({"user": serialize_user(demo_user), "tokens": issue_tokens(demo_user["id"])}, "Logged in")
@@ -145,7 +152,7 @@ def login():
 def me():
     user_id = get_jwt_identity()
 
-    if is_demo_identity(user_id):
+    if is_demo_identity(user_id) and current_app.config.get("DEMO_LOGIN_ENABLED"):
         return success({"user": serialize_user(DEMO_USERS_BY_ID[user_id])})
 
     with db_cursor() as cursor:
@@ -162,6 +169,11 @@ def me():
 @jwt_required(refresh=True)
 def refresh():
     user_id = get_jwt_identity()
+
+    # Demo identities cannot mint new tokens once the demo gate is off.
+    if is_demo_identity(user_id) and not current_app.config.get("DEMO_LOGIN_ENABLED"):
+        return error("UNAUTHORIZED", "Authentication is required.", 401)
+
     return success({"tokens": issue_tokens(user_id)})
 
 

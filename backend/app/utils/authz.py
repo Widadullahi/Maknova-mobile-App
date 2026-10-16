@@ -1,5 +1,6 @@
 from functools import wraps
 
+from flask import current_app
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from ..db import db_cursor
@@ -12,8 +13,10 @@ def get_current_user():
     if not user_id:
         return None
 
+    # Demo identities only resolve when DEMO_LOGIN_ENABLED — otherwise a stale
+    # demo JWT (or a guessed one) cannot impersonate a demo account.
     demo_user = get_demo_user(user_id)
-    if demo_user:
+    if demo_user and current_app.config.get("DEMO_LOGIN_ENABLED"):
         return demo_user
 
     with db_cursor() as cursor:

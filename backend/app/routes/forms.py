@@ -4,11 +4,11 @@ from uuid import uuid4
 from flask import Blueprint, current_app, request
 
 from ..db import db_cursor
-from ..routes.estates import can_manage_estate, get_estate
 from ..utils.audit import record_audit_log
 from ..utils.authz import require_roles
 from ..utils.paystack import PaystackError, initialize_transaction, verify_transaction
 from ..utils.responses import error, success
+from ..utils.scope import can_access_estate
 from ..utils.settings import get_commission_percent
 
 forms_bp = Blueprint("forms", __name__)
@@ -82,10 +82,14 @@ def serialize_allocation(row):
 
 
 def can_access_estate_or_admin(cursor, user, estate_id):
+    """Review finding #2: forms are submitted BY residents/security too, so this
+    check must use estate ACCESS (residents/security derive their estates from
+    residents/security_assignments), not estate OWNERSHIP (can_manage_estate —
+    which only estate managers/individual sellers satisfy). The old check 403'd
+    every resident/security submission that carried an estateId."""
     if not estate_id:
         return True
-    estate = get_estate(cursor, estate_id)
-    return bool(estate and can_manage_estate(user, estate))
+    return can_access_estate(cursor, user, estate_id)
 
 
 def find_usable_document_payment(cursor, template_code, property_id):
@@ -111,6 +115,102 @@ def list_templates(current_user):
         templates = [serialize_template(row) for row in cursor.fetchall()]
 
     return success({"templates": templates})
+
+
+@forms_bp.post("/templates")
+@require_roles("admin", "super_admin")
+def create_template(current_user):
+    """Previously templates were seed-only (GET). Staff can now create new form
+    templates at runtime. Codes are unique across all versions."""
+    payload = request.get_json(silent=True) or {}
+    name = (payload.get("name") or "").strip()
+    code = (payload.get("code") or "").strip().lower()
+    schema = payload.get("schema")
+
+    if not name:
+        return error("VALIDATION_ERROR", "A template name is required.", 422)
+    if not code or not all(part.isalnum() for part in code.split("_")):
+        return error("VALIDATION_ERROR", "A template code of lowercase words separated by underscores is required.", 422)
+    if not isinstance(schema, dict):
+        return error("VALIDATION_ERROR", "Schema must be a JSON object.", 422)
+
+    with db_cursor(commit=True) as cursor:
+        cursor.execute("SELECT id FROM digital_form_templates WHERE code = %s LIMIT 1", (code,))
+        if cursor.fetchone():
+            return error("TEMPLATE_CODE_EXISTS", "A form template with this code already exists.", 409)
+
+        cursor.execute(
+            """
+            INSERT INTO digital_form_templates (code, name, version, schema_json, is_active)
+            VALUES (%s, %s, 'v1', %s, 1)
+            """,
+            (code, name, json.dumps(schema)),
+        )
+        template_id = cursor.lastrowid
+        record_audit_log(
+            cursor,
+            current_user["id"],
+            "form_template.created",
+            "digital_form_template",
+            template_id,
+            {"code": code, "name": name},
+        )
+        cursor.execute("SELECT * FROM digital_form_templates WHERE id = %s", (template_id,))
+        template = cursor.fetchone()
+
+    return success({"template": serialize_template(template)}, "Form template created", 201)
+
+
+@forms_bp.patch("/templates/<int:template_id>")
+@require_roles("admin", "super_admin")
+def update_template(current_user, template_id):
+    """Update a template's name, schema, or active flag in place."""
+    payload = request.get_json(silent=True) or {}
+
+    with db_cursor(commit=True) as cursor:
+        cursor.execute("SELECT * FROM digital_form_templates WHERE id = %s", (template_id,))
+        template = cursor.fetchone()
+        if not template:
+            return error("NOT_FOUND", "Form template was not found.", 404)
+
+        updates = []
+        params = []
+        if "name" in payload:
+            name = (payload.get("name") or "").strip()
+            if not name:
+                return error("VALIDATION_ERROR", "Template name cannot be empty.", 422)
+            updates.append("name = %s")
+            params.append(name)
+        if "schema" in payload:
+            schema = payload.get("schema")
+            if not isinstance(schema, dict):
+                return error("VALIDATION_ERROR", "Schema must be a JSON object.", 422)
+            updates.append("schema_json = %s")
+            params.append(json.dumps(schema))
+        if "isActive" in payload:
+            updates.append("is_active = %s")
+            params.append(1 if payload.get("isActive") else 0)
+
+        if not updates:
+            return error("VALIDATION_ERROR", "Nothing to update.", 422)
+
+        params.append(template_id)
+        cursor.execute(
+            f"UPDATE digital_form_templates SET {', '.join(updates)} WHERE id = %s",
+            tuple(params),
+        )
+        record_audit_log(
+            cursor,
+            current_user["id"],
+            "form_template.updated",
+            "digital_form_template",
+            template_id,
+            {"fields": [u.split(" =")[0] for u in updates]},
+        )
+        cursor.execute("SELECT * FROM digital_form_templates WHERE id = %s", (template_id,))
+        template = cursor.fetchone()
+
+    return success({"template": serialize_template(template)}, "Form template updated")
 
 
 @forms_bp.get("/submissions")

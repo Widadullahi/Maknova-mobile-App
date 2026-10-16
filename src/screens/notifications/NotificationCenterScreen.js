@@ -9,15 +9,7 @@ import { colors, spacing } from '../../theme';
 import { useNotifications } from '../../context/NotificationsContext';
 
 export function NotificationCenterScreen({ navigation }) {
-  const { notifications, unreadCount, addInAppNotification, markRead, markAllRead } = useNotifications();
-
-  function handleSendTest() {
-    addInAppNotification({
-      title: 'In-app notification',
-      body: 'This is a local notification and appears in the notification center.',
-      type: 'test',
-    });
-  }
+  const { notifications, unreadCount, markRead, markAllRead } = useNotifications();
 
   return (
     <Screen padded={false}>
@@ -32,11 +24,10 @@ export function NotificationCenterScreen({ navigation }) {
         <View style={styles.header}>
           <HugeiconsIcon icon={Notification03Icon} size={28} color={colors.primary} />
           <AppText style={styles.title}>Notifications</AppText>
-          <AppText muted style={styles.subtitle}>In-app alerts for visitors, payments, maintenance, documents, and reports.</AppText>
+          <AppText muted style={styles.subtitle}>Push and in-app alerts for payments, maintenance, verification, documents, and reports.</AppText>
         </View>
 
         <View style={styles.actions}>
-          <Button title="Send test notification" onPress={handleSendTest} />
           <Button title="Mark all read" onPress={markAllRead} variant="secondary" />
         </View>
 

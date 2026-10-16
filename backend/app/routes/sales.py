@@ -295,6 +295,21 @@ def create_sale(current_user, estate_id):
         if property_row["status"] not in ("reserved", "under_offer", "available"):
             return error("PROPERTY_UNAVAILABLE", "This property cannot be marked sold from its current status.", 422)
 
+        # Review finding #5: `payload.get("salePrice") or ...` treated an
+        # explicit salePrice of 0 as "not provided" and silently fell back to
+        # the listing price. Validate explicitly instead — salePrice is optional
+        # (falls back to the property price), but if given it must be a real
+        # positive amount.
+        sale_price = payload.get("salePrice")
+        if sale_price is None or sale_price == "":
+            sale_price = property_row["price"]
+        try:
+            sale_price = float(sale_price)
+        except (TypeError, ValueError):
+            return error("VALIDATION_ERROR", "Sale price must be a number.", 422)
+        if sale_price <= 0:
+            return error("VALIDATION_ERROR", "Sale price must be greater than zero.", 422)
+
         cursor.execute("SELECT id FROM buyers WHERE id = %s AND estate_id = %s LIMIT 1", (buyer_id, estate_id))
         if not cursor.fetchone():
             return error("NOT_FOUND", "Buyer was not found.", 404)
@@ -316,7 +331,7 @@ def create_sale(current_user, estate_id):
                 property_id,
                 buyer_id,
                 reservation_id,
-                payload.get("salePrice") or property_row["price"] or 0,
+                sale_price,
                 payload.get("paymentStatus") or "pending",
                 payload.get("channel") if payload.get("channel") in ("online", "in_office") else "online",
                 (payload.get("note") or "").strip() or None,

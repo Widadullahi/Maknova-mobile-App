@@ -1,1 +1,17 @@
 node_modules
+
+# Backend secrets & local artifacts — never commit
+backend/.env
+backend/.venv/
+backend/uploads/
+__pycache__/
+*.pyc
+
+# Expo dev artifacts
+.expo/
+.expo-check-*/
+.expo-theme-check/
+
+# Local dev logs / machine-specific config
+next-dev.log
+local.properties

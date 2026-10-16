@@ -9,6 +9,7 @@ from werkzeug.utils import secure_filename
 from ..db import db_cursor
 from ..utils.audit import record_audit_log
 from ..utils.authz import require_roles
+from ..utils.notify import create_notification, flush_push_queue, queue_push
 from ..utils.responses import error, success
 from ..utils.scope import can_manage_estate
 
@@ -374,9 +375,28 @@ def publish_estate(current_user, estate_id):
             estate_id,
             {"isPublished": is_published},
         )
+
+        if is_published:
+            create_notification(
+                cursor,
+                user_id=estate["manager_user_id"],
+                title="Estate is now live",
+                body=f"{estate['name']} is published and visible to potential buyers.",
+                type="estate",
+                entity_type="estate",
+                entity_id=estate_id,
+            )
+            queue_push(
+                [estate["manager_user_id"]],
+                title="Estate is now live",
+                body=f"{estate['name']} is published and visible to potential buyers.",
+                data={"type": "estate", "entityType": "estate", "entityId": estate_id},
+            )
+
         cursor.execute("SELECT * FROM estates WHERE id = %s", (estate_id,))
         updated = cursor.fetchone()
 
+    flush_push_queue()
     return success({"estate": serialize_estate(updated)}, "Estate visibility updated")
 
 
@@ -648,16 +668,33 @@ def update_property_status(current_user, estate_id, property_id):
                 422,
             )
 
-        cursor.execute(
-            """
-            UPDATE properties
-            SET status = %s,
-                buyer_user_id = COALESCE(%s, buyer_user_id),
-                owner_user_id = COALESCE(%s, owner_user_id)
-            WHERE id = %s
-            """,
-            (next_status, buyer_user_id, owner_user_id, property_id),
-        )
+        if next_status in BUYER_VISIBLE_STATUSES:
+            # Entering sold/allocated: attach (or keep) the buyer/owner account.
+            cursor.execute(
+                """
+                UPDATE properties
+                SET status = %s,
+                    buyer_user_id = COALESCE(%s, buyer_user_id),
+                    owner_user_id = COALESCE(%s, owner_user_id)
+                WHERE id = %s
+                """,
+                (next_status, buyer_user_id, owner_user_id, property_id),
+            )
+        else:
+            # Review finding #3: leaving a buyer-visible status (e.g. an admin
+            # reverting sold/allocated back to available) must DROP the stale
+            # buyer/owner account, not silently keep it via COALESCE — otherwise
+            # the plot keeps showing up in the previous buyer's purchases list.
+            cursor.execute(
+                """
+                UPDATE properties
+                SET status = %s,
+                    buyer_user_id = %s,
+                    owner_user_id = %s
+                WHERE id = %s
+                """,
+                (next_status, buyer_user_id, owner_user_id, property_id),
+            )
         cursor.execute(
             """
             INSERT INTO property_status_history
@@ -894,10 +931,15 @@ def get_property_document_file(current_user, document_id):
     if not document_path or not document_path.exists():
         return error("FILE_NOT_FOUND", "The uploaded document file is missing from storage.", 404)
 
+    # Staff (admin/super_admin) access is strictly VIEW-ONLY: their ?download=1
+    # is served inline, exactly like the verification vault endpoint does. Only
+    # the owner-manager and the buyer-of-deed can receive attachment downloads.
+    staff_view_only = current_user["role"] in ("admin", "super_admin")
+
     return send_file(
         document_path,
         mimetype=document.get("mime_type") or None,
-        as_attachment=request.args.get("download") == "1",
+        as_attachment=request.args.get("download") == "1" and not staff_view_only,
         download_name=document.get("file_name") or document_path.name,
     )
 
@@ -906,41 +948,55 @@ def get_property_document_file(current_user, document_id):
 @require_roles("buyer", "resident", "public_user", "admin", "super_admin")
 def list_my_purchases(current_user):
     with db_cursor() as cursor:
+        # Review finding #7: this used to run one sale query and one document
+        # query per property (N+1). The latest-sale id is now resolved with a
+        # correlated subquery in the same round trip, and documents are fetched
+        # in a single IN (...) query below.
         cursor.execute(
             """
-            SELECT * FROM properties
-            WHERE buyer_user_id = %s OR owner_user_id = %s
-            ORDER BY updated_at DESC
+            SELECT
+              p.*,
+              (SELECT s.id FROM sales s WHERE s.property_id = p.id ORDER BY s.id DESC LIMIT 1) AS latest_sale_id
+            FROM properties p
+            WHERE p.buyer_user_id = %s OR p.owner_user_id = %s
+            ORDER BY p.updated_at DESC
             LIMIT 100
             """,
             (current_user["id"], current_user["id"]),
         )
         rows = cursor.fetchall()
 
+        documents_by_property = {}
+        visible_ids = [row["id"] for row in rows if row["status"] in BUYER_VISIBLE_STATUSES]
+        if visible_ids:
+            placeholders = ", ".join(["%s"] * len(visible_ids))
+            cursor.execute(
+                f"""
+                SELECT *
+                FROM property_documents
+                WHERE property_id IN ({placeholders})
+                  AND category IN ('image', 'deed_of_assignment')
+                ORDER BY created_at DESC
+                """,
+                tuple(visible_ids),
+            )
+            for doc in cursor.fetchall():
+                documents_by_property.setdefault(doc["property_id"], []).append(doc)
+
         properties = []
         for row in rows:
             serialized = serialize_property(row)
-            cursor.execute(
-                "SELECT id FROM sales WHERE property_id = %s ORDER BY id DESC LIMIT 1",
-                (row["id"],),
-            )
-            sale_row = cursor.fetchone()
-            serialized["saleId"] = sale_row["id"] if sale_row else None
+            serialized["saleId"] = row.get("latest_sale_id")
             if row["status"] in BUYER_VISIBLE_STATUSES:
                 # Buyers only ever get marketing photos and their own deed of
                 # assignment — never the structural title/allocation documents
                 # behind the estate manager's verification, per the platform's
                 # document-privacy rule. Those stay staff/owner-only, served
                 # exclusively via get_property_document_file() above.
-                cursor.execute(
-                    """
-                    SELECT * FROM property_documents
-                    WHERE property_id = %s AND category IN ('image', 'deed_of_assignment')
-                    ORDER BY created_at DESC
-                    """,
-                    (row["id"],),
-                )
-                serialized["documents"] = [serialize_property_document(doc) for doc in cursor.fetchall()]
+                serialized["documents"] = [
+                    serialize_property_document(doc)
+                    for doc in documents_by_property.get(row["id"], [])
+                ]
             else:
                 serialized["documents"] = []
             properties.append(serialized)

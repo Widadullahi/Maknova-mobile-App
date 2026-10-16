@@ -10,7 +10,6 @@ from .routes.analytics import analytics_bp
 from .routes.auth import auth_bp
 from .routes.email_verification import email_verification_bp
 from .routes.communication import communication_bp
-from .routes.demo import demo_bp
 from .routes.estates import estates_bp
 from .routes.forms import forms_bp
 from .routes.health import health_bp
@@ -59,7 +58,6 @@ def create_app():
     app.register_blueprint(forms_bp, url_prefix="/api/v1/forms")
     app.register_blueprint(residents_bp, url_prefix="/api/v1")
     app.register_blueprint(admin_bp, url_prefix="/api/v1/admin")
-    app.register_blueprint(demo_bp, url_prefix="/api/v1/demo")
     app.register_blueprint(visitor_passes_bp, url_prefix="/api/v1/visitor-passes")
     app.register_blueprint(notifications_bp, url_prefix="/api/v1/notifications")
     app.register_blueprint(reports_bp, url_prefix="/api/v1/reports")

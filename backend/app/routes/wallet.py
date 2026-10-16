@@ -5,6 +5,7 @@ from flask import Blueprint, current_app, request
 from ..db import db_cursor
 from ..utils.audit import record_audit_log
 from ..utils.authz import require_roles
+from ..utils.notify import create_notification, flush_push_queue, queue_push
 from ..utils.paystack import PaystackError, initialize_transaction, verify_transaction
 from ..utils.responses import error, success
 from ..utils.settings import get_commission_percent, get_guest_pass_fee, set_setting
@@ -169,6 +170,22 @@ def apply_successful_topup(cursor, wallet_transaction, paystack_data):
         "UPDATE wallets SET balance = balance + %s WHERE id = %s",
         (wallet_transaction["net_amount"], wallet_transaction["wallet_id"]),
     )
+    amount_naira = float(wallet_transaction["net_amount"] or 0)
+    create_notification(
+        cursor,
+        user_id=wallet_transaction["user_id"],
+        title="Wallet funded",
+        body=f"Your wallet top-up of ₦{amount_naira:,.0f} was successful.",
+        type="payment",
+        entity_type="wallet_transaction",
+        entity_id=wallet_transaction["id"],
+    )
+    queue_push(
+        [wallet_transaction["user_id"]],
+        title="Wallet funded",
+        body=f"Your wallet top-up of ₦{amount_naira:,.0f} was successful.",
+        data={"type": "payment", "entityType": "wallet", "entityId": wallet_transaction["id"]},
+    )
     record_audit_log(
         cursor,
         None,
@@ -205,6 +222,7 @@ def verify_topup(current_user, reference):
         wallet_transaction = cursor.fetchone()
         wallet = get_or_create_wallet(cursor, current_user["id"])
 
+    flush_push_queue()
     return success({"transaction": serialize_wallet_transaction(wallet_transaction), "wallet": serialize_wallet(wallet)})
 
 

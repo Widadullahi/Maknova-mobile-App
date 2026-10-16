@@ -17,16 +17,7 @@ import { StatusChip } from '../../components/StatusChip';
 import { colors, spacing } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import { useVisitorPasses } from '../../context/VisitorPassesContext';
-
-function getInitials(name) {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0].toUpperCase())
-    .join('');
-}
+import { getInitials } from '../../utils/format';
 
 export function SecurityHomeScreen({ navigation }) {
   const { logout, user } = useAuth();

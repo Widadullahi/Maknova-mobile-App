@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { Image, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import { VideoView, useVideoPlayer } from 'expo-video';
 import { HugeiconsIcon } from '@hugeicons/react-native';
 import { Camera01Icon, Delete02Icon, Video01Icon } from '@hugeicons/core-free-icons';
 import { AppText } from './AppText';
@@ -25,6 +26,27 @@ function stampMedia(cameraResult, kind) {
     capturedAt: new Date().toISOString(),
     mediaKind: kind,
   };
+}
+
+// Captured videos previously rendered as a static icon placeholder — the files
+// uploaded fine but could never be played back. A VideoView per thumb (hooks
+// require their own component) gives inline muted autoplay/loop preview.
+function VideoThumb({ uri }) {
+  const player = useVideoPlayer(uri, (playerInstance) => {
+    playerInstance.loop = true;
+    playerInstance.muted = true;
+    playerInstance.play();
+  });
+
+  return (
+    <VideoView
+      style={styles.thumbImage}
+      player={player}
+      contentFit="cover"
+      allowsFullscreen={false}
+      allowsPictureInPicture={false}
+    />
+  );
 }
 
 export function PlotPhotoCapture({ photos, onChange, maxPhotos = 8 }) {
@@ -163,9 +185,7 @@ export function PlotPhotoCapture({ photos, onChange, maxPhotos = 8 }) {
           {photos.map((photo, index) => (
             <View key={`${photo.uri}-${index}`} style={styles.thumb}>
               {photo.mediaKind === MEDIA_KINDS.video ? (
-                <View style={styles.videoPlaceholder}>
-                  <HugeiconsIcon icon={Video01Icon} size={26} color="#fff" />
-                </View>
+                <VideoThumb uri={photo.uri} />
               ) : (
                 <Image source={{ uri: photo.uri }} style={styles.thumbImage} />
               )}

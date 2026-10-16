@@ -4,6 +4,7 @@ from ..db import db_cursor
 from ..utils.audit import record_audit_log
 from ..utils.authz import require_roles
 from ..utils.crypto import decrypt_json, encrypt_json
+from ..utils.notify import create_notification, flush_push_queue, queue_push
 from ..utils.responses import error, success
 
 reports_bp = Blueprint("reports", __name__)
@@ -89,6 +90,23 @@ def create_estate_report():
         cursor.execute("SELECT * FROM estate_reports WHERE id = %s", (report_id,))
         report = cursor.fetchone()
 
+        create_notification(
+            cursor,
+            role="admin",
+            title="New estate report",
+            body=f"A {category.replace('_', ' ')} report was submitted and needs review.",
+            type="report",
+            entity_type="estate_report",
+            entity_id=report_id,
+        )
+        queue_push(
+            role="admin",
+            title="New estate report",
+            body=f"A {category.replace('_', ' ')} report was submitted and needs review.",
+            data={"type": "report", "entityType": "estate_report", "entityId": report_id},
+        )
+
+    flush_push_queue()
     return success({"report": serialize_report(report)}, "Estate report submitted", 201)
 
 
@@ -157,7 +175,30 @@ def update_estate_report_status(current_user, report_id):
             report_id,
             {"status": status, "estateId": report.get("estate_id")},
         )
+
+        # Close the loop with whoever filed the report (only possible for
+        # signed-in reporters; public/anonymous reports have reporter_user_id
+        # NULL by design).
+        if report.get("reporter_user_id"):
+            create_notification(
+                cursor,
+                user_id=report["reporter_user_id"],
+                title="Report update",
+                body=f"Your report status changed to '{status.replace('_', ' ')}'."
+                + (f" Admin note: {admin_note}" if admin_note else ""),
+                type="report",
+                entity_type="estate_report",
+                entity_id=report_id,
+            )
+            queue_push(
+                [report["reporter_user_id"]],
+                title="Report update",
+                body=f"Your report status changed to '{status.replace('_', ' ')}'.",
+                data={"type": "report", "entityType": "estate_report", "entityId": report_id},
+            )
+
         cursor.execute("SELECT * FROM estate_reports WHERE id = %s", (report_id,))
         updated = cursor.fetchone()
 
+    flush_push_queue()
     return success({"report": serialize_report(updated)}, "Report status updated")

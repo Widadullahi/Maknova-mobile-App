@@ -16,18 +16,9 @@ import { colors, spacing } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import { useSavedListings } from '../../context/SavedListingsContext';
 import { usePropertyDeals } from '../../context/PropertyDealsContext';
+import { getInitials } from '../../utils/format';
 
 const LISTING_FILTERS = ['All', 'Verified', 'Available'];
-
-function getInitials(name) {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0].toUpperCase())
-    .join('');
-}
 
 function filterListings(listings, filter, query) {
   let result = listings;

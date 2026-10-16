@@ -16,16 +16,7 @@ import { StatusChip } from '../../components/StatusChip';
 import { ROLE_LABELS } from '../../constants/roles';
 import { colors, spacing } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
-
-function getInitials(name) {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0].toUpperCase())
-    .join('');
-}
+import { getInitials } from '../../utils/format';
 
 const FORMS_ROLES = new Set(['estate_manager', 'resident', 'buyer', 'security', 'admin', 'super_admin']);
 const MANAGER_ROLES = new Set(['estate_manager', 'admin', 'super_admin']);

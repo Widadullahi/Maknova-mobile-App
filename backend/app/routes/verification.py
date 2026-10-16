@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 from uuid import uuid4
@@ -8,9 +9,32 @@ from werkzeug.utils import secure_filename
 from ..db import db_cursor
 from ..utils.audit import record_audit_log
 from ..utils.authz import get_current_user, require_roles
+from ..utils.notify import create_notification, flush_push_queue, queue_push
 from ..utils.responses import error, success
 
 verification_bp = Blueprint("verification", __name__)
+
+
+def _has_real_signature(application):
+    """A typed signature is non-empty text; a drawn signature is a non-empty
+    JSON stroke payload. An empty drawn pad serializes to "[]" — that is NOT a
+    signature and must not pass submission validation (review finding #6)."""
+    if (application.get("signature_text") or "").strip():
+        return True
+
+    raw = application.get("signature_data")
+    if not raw:
+        return False
+
+    parsed = raw
+    if isinstance(raw, str):
+        try:
+            parsed = json.loads(raw)
+        except (ValueError, TypeError):
+            return True  # non-JSON string payload: treat any content as signed
+    if isinstance(parsed, (list, dict)):
+        return len(parsed) > 0
+    return True
 
 APPLICANT_TYPES = {"estate_developer", "individual_landowner"}
 
@@ -264,6 +288,8 @@ def create_or_update_application(current_user):
         return error("VALIDATION_ERROR", "Applicant type is not supported.", 422)
     if signature_method not in ("typed", "drawn"):
         return error("VALIDATION_ERROR", "Signature method is not supported.", 422)
+    if signature_method == "drawn" and not _has_real_signature({"signature_text": signature_text, "signature_data": signature_data}):
+        return error("VALIDATION_ERROR", "Please draw your signature before continuing.", 422)
     if not estate_name or not estate_location:
         return error("VALIDATION_ERROR", "Estate/property name and location are required.", 422)
     if not village_name or not parties_involved:
@@ -488,8 +514,7 @@ def submit_application(current_user, application_id):
         if not application:
             return error("NOT_FOUND", "Verification application was not found.", 404)
 
-        has_signature = bool(application.get("signature_text")) or bool(application.get("signature_data"))
-        if not application.get("accepted_terms_at") or not has_signature:
+        if not application.get("accepted_terms_at") or not _has_real_signature(application):
             return error("VALIDATION_ERROR", "Terms acceptance and signature are required.", 422)
         if not application.get("village_name") or not application.get("parties_involved") or application.get("listing_price") is None:
             return error(
@@ -527,8 +552,28 @@ def submit_application(current_user, application_id):
             """,
             (application_id,),
         )
+
+        # Alert verification staff (admins) that a new application is waiting
+        # for review.
+        create_notification(
+            cursor,
+            role="admin",
+            title="New verification application",
+            body=f"{application.get('estate_name') or 'A new estate'} was submitted for verification review.",
+            type="verification",
+            entity_type="verification_application",
+            entity_id=application_id,
+        )
+        queue_push(
+            role="admin",
+            title="New verification application",
+            body=f"{application.get('estate_name') or 'A new estate'} was submitted for verification review.",
+            data={"type": "verification", "entityType": "verification_application", "entityId": application_id},
+        )
+
         cursor.execute("SELECT * FROM estate_verification_applications WHERE id = %s", (application_id,))
         updated = cursor.fetchone()
         documents = get_application_documents(cursor, application_id)
 
+    flush_push_queue()
     return success({"application": serialize_application(updated, documents)}, "Application submitted")

@@ -4,6 +4,7 @@ from ..db import db_cursor
 from ..utils.audit import record_audit_log
 from ..utils.authz import require_roles
 from ..utils.crypto import decrypt_json, encrypt_json
+from ..utils.notify import create_notification, flush_push_queue, queue_push
 from ..utils.responses import error, success
 from ..utils.scope import can_access_estate
 
@@ -252,9 +253,29 @@ def update_request_status(current_user, request_id):
             request_id,
             {"status": status, "providerId": payload.get("providerId")},
         )
+
+        # Keep the resident who filed the request in the loop.
+        if maintenance_request.get("resident_user_id"):
+            create_notification(
+                cursor,
+                user_id=maintenance_request["resident_user_id"],
+                title="Maintenance update",
+                body=f"Your maintenance request '{maintenance_request.get('title') or request_id}' is now {status.replace('_', ' ')}.",
+                type="maintenance",
+                entity_type="maintenance_request",
+                entity_id=request_id,
+            )
+            queue_push(
+                [maintenance_request["resident_user_id"]],
+                title="Maintenance update",
+                body=f"Your maintenance request is now {status.replace('_', ' ')}.",
+                data={"type": "maintenance", "entityType": "maintenance_request", "entityId": request_id},
+            )
+
         cursor.execute("SELECT * FROM maintenance_requests WHERE id = %s", (request_id,))
         updated = cursor.fetchone()
 
+    flush_push_queue()
     return success({"request": serialize_request(updated)}, "Maintenance request updated")
 
 

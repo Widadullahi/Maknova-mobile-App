@@ -26,7 +26,19 @@ class Config:
     MYSQL_USER = os.getenv("MYSQL_USER", "real_estate")
     MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "real_estate")
     MYSQL_DATABASE = os.getenv("MYSQL_DATABASE", "real_estate")
+    # Managed-MySQL TLS (Aiven/RDS/DigitalOcean). Point MYSQL_SSL_CA at the
+    # provider's CA certificate file; empty = no TLS (local/VPS dev unchanged).
+    MYSQL_SSL_CA = os.getenv("MYSQL_SSL_CA", "")
+    MYSQL_SSL_VERIFY_IDENTITY = os.getenv("MYSQL_SSL_VERIFY_IDENTITY", "false").lower() in ("1", "true", "yes")
     RUN_MIGRATIONS_ON_STARTUP = os.getenv("RUN_MIGRATIONS_ON_STARTUP", "true").lower() in ("1", "true", "yes")
+    # Demo login accounts (utils/demo.py). Disabled by default — production must
+    # never accept demo@estate.com / demo1234. Set DEMO_LOGIN_ENABLED=true ONLY in
+    # local/demo environments where the seeded demo identities are needed.
+    DEMO_LOGIN_ENABLED = os.getenv("DEMO_LOGIN_ENABLED", "false").lower() in ("1", "true", "yes")
+    # Expo push service (https://exp.host). Device tokens are registered by the
+    # mobile app via POST /notifications/push-token. Disable in dev to skip all
+    # outbound push calls.
+    EXPO_PUSH_ENABLED = os.getenv("EXPO_PUSH_ENABLED", "true").lower() in ("1", "true", "yes")
     SEED_DEFAULT_ROLE_ACCOUNTS = os.getenv("SEED_DEFAULT_ROLE_ACCOUNTS", "true").lower() in ("1", "true", "yes")
     UPLOAD_DIR = os.getenv(
         "UPLOAD_DIR",
@@ -59,7 +71,7 @@ class Config:
     # only the fallback used before that setting has ever been saved.
     DEFAULT_GUEST_PASS_FEE = float(os.getenv("DEFAULT_GUEST_PASS_FEE", "50.00"))
 
-    # Transactional email (SMTP). When EMAIL_SMTP_HOST is empty the backend does
+    # Transactional email (SMTP) — see .env.example. When EMAIL_SMTP_HOST is empty the backend does
     # NOT send mail; the register-time OTP endpoint returns the code in the
     # response (devCode) and logs it so development can proceed without a provider.
     EMAIL_SMTP_HOST = os.getenv("EMAIL_SMTP_HOST", "")
