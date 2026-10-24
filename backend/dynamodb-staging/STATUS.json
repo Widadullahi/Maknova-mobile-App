@@ -1,0 +1,133 @@
+{
+  "stage": "local-only",
+  "region": "eu-west-1",
+  "live_backend_changed": false,
+  "testing_urls_changed": false,
+  "aws_resources_created": false,
+  "source_data_exported": false,
+  "full_runtime_migration_complete": false,
+  "authentication_prototype": "23 local emulator tests passed across migration and authentication",
+  "files_to_port": [
+    {
+      "file": "backend/app/migrations.py",
+      "sql_calls": 4
+    },
+    {
+      "file": "backend/app/routes/admin.py",
+      "sql_calls": 18
+    },
+    {
+      "file": "backend/app/routes/analytics.py",
+      "sql_calls": 9
+    },
+    {
+      "file": "backend/app/routes/auth.py",
+      "sql_calls": 10
+    },
+    {
+      "file": "backend/app/routes/communication.py",
+      "sql_calls": 32
+    },
+    {
+      "file": "backend/app/routes/email_verification.py",
+      "sql_calls": 6
+    },
+    {
+      "file": "backend/app/routes/estates.py",
+      "sql_calls": 37
+    },
+    {
+      "file": "backend/app/routes/forms.py",
+      "sql_calls": 23
+    },
+    {
+      "file": "backend/app/routes/installments.py",
+      "sql_calls": 21
+    },
+    {
+      "file": "backend/app/routes/maintenance.py",
+      "sql_calls": 20
+    },
+    {
+      "file": "backend/app/routes/notifications.py",
+      "sql_calls": 8
+    },
+    {
+      "file": "backend/app/routes/payments.py",
+      "sql_calls": 21
+    },
+    {
+      "file": "backend/app/routes/public.py",
+      "sql_calls": 3
+    },
+    {
+      "file": "backend/app/routes/reports.py",
+      "sql_calls": 9
+    },
+    {
+      "file": "backend/app/routes/residents.py",
+      "sql_calls": 6
+    },
+    {
+      "file": "backend/app/routes/sales.py",
+      "sql_calls": 24
+    },
+    {
+      "file": "backend/app/routes/saved_listings.py",
+      "sql_calls": 4
+    },
+    {
+      "file": "backend/app/routes/support.py",
+      "sql_calls": 6
+    },
+    {
+      "file": "backend/app/routes/users.py",
+      "sql_calls": 17
+    },
+    {
+      "file": "backend/app/routes/verification.py",
+      "sql_calls": 17
+    },
+    {
+      "file": "backend/app/routes/visitor_passes.py",
+      "sql_calls": 16
+    },
+    {
+      "file": "backend/app/routes/wallet.py",
+      "sql_calls": 13
+    },
+    {
+      "file": "backend/app/seeds.py",
+      "sql_calls": 2
+    },
+    {
+      "file": "backend/app/utils/audit.py",
+      "sql_calls": 1
+    },
+    {
+      "file": "backend/app/utils/authz.py",
+      "sql_calls": 1
+    },
+    {
+      "file": "backend/app/utils/notify.py",
+      "sql_calls": 3
+    },
+    {
+      "file": "backend/app/utils/scope.py",
+      "sql_calls": 6
+    },
+    {
+      "file": "backend/app/utils/settings.py",
+      "sql_calls": 2
+    }
+  ],
+  "source_table_count": 46,
+  "sql_calls_to_review": 339,
+  "tests_passed": 23,
+  "tests_failed": 0,
+  "public_links_last_check": {
+    "mobile": 200,
+    "admin": 200,
+    "manager": 200
+  }
+}

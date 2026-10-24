@@ -1,0 +1,41 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Isolated Maknova DynamoDB staging migration; does not change live API or DNS",
+  "Parameters": {
+    "StageName": { "Type": "String", "Default": "migration", "AllowedPattern": "[a-z][a-z0-9-]{0,30}" }
+  },
+  "Resources": {
+    "StagingData": {
+      "Type": "AWS::DynamoDB::Table",
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "Properties": {
+        "TableName": { "Fn::Sub": "maknova-staging-${StageName}" },
+        "BillingMode": "PAY_PER_REQUEST",
+        "DeletionProtectionEnabled": true,
+        "PointInTimeRecoverySpecification": { "PointInTimeRecoveryEnabled": true },
+        "SSESpecification": { "SSEEnabled": true },
+        "AttributeDefinitions": [
+          { "AttributeName": "PK", "AttributeType": "S" },
+          { "AttributeName": "SK", "AttributeType": "S" },
+          { "AttributeName": "GSI1PK", "AttributeType": "S" },
+          { "AttributeName": "GSI1SK", "AttributeType": "S" }
+        ],
+        "KeySchema": [
+          { "AttributeName": "PK", "KeyType": "HASH" },
+          { "AttributeName": "SK", "KeyType": "RANGE" }
+        ],
+        "GlobalSecondaryIndexes": [{
+          "IndexName": "ByEntity",
+          "KeySchema": [
+            { "AttributeName": "GSI1PK", "KeyType": "HASH" },
+            { "AttributeName": "GSI1SK", "KeyType": "RANGE" }
+          ],
+          "Projection": { "ProjectionType": "KEYS_ONLY" }
+        }],
+        "Tags": [ { "Key": "Application", "Value": "Maknova" }, { "Key": "Environment", "Value": "staging" } ]
+      }
+    }
+  },
+  "Outputs": { "TableName": { "Value": { "Ref": "StagingData" } } }
+}

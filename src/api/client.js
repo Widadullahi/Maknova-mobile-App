@@ -7,6 +7,19 @@ import { clearTokens, getAccessToken, getRefreshToken, saveTokens } from '../ser
 // 401s during that window into a single refresh call instead of one per request.
 let refreshInFlight = null;
 
+async function fetchWithTimeout(url, options = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 20000);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } catch (error) {
+    if (controller.signal.aborted) throw new Error('The server took too long to respond. Check your connection and try again.');
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function refreshAccessToken() {
   if (!refreshInFlight) {
     refreshInFlight = (async () => {
@@ -14,7 +27,7 @@ async function refreshAccessToken() {
       if (!refreshToken) return null;
 
       try {
-        const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+        const response = await fetchWithTimeout(`${API_BASE_URL}/auth/refresh`, {
           method: 'POST',
           headers: { Accept: 'application/json', Authorization: `Bearer ${refreshToken}` },
         });
@@ -48,7 +61,7 @@ async function request(path, options = {}, { isRetry = false } = {}) {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetchWithTimeout(`${API_BASE_URL}${path}`, {
     ...options,
     headers,
   });

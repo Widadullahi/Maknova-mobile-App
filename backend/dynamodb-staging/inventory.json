@@ -1,0 +1,167 @@
+{
+  "tables": [
+    "account_deletion_requests",
+    "allocations",
+    "analytics_exports",
+    "announcement_acknowledgements",
+    "announcements",
+    "audit_logs",
+    "buyers",
+    "community_group_messages",
+    "conversation_participants",
+    "conversations",
+    "digital_form_templates",
+    "document_generation_payments",
+    "email_verification_codes",
+    "estate_documents",
+    "estate_reports",
+    "estate_verification_applications",
+    "estates",
+    "form_submissions",
+    "installment_plans",
+    "installments",
+    "maintenance_requests",
+    "maintenance_updates",
+    "messages",
+    "notifications",
+    "password_reset_tokens",
+    "payment_events",
+    "payment_transactions",
+    "platform_settings",
+    "properties",
+    "property_documents",
+    "property_status_history",
+    "push_tokens",
+    "reservations",
+    "residents",
+    "sales",
+    "saved_listings",
+    "security_assignments",
+    "service_providers",
+    "signature_records",
+    "support_tickets",
+    "users",
+    "verification_documents",
+    "visitor_pass_verifications",
+    "visitor_passes",
+    "wallet_transactions",
+    "wallets"
+  ],
+  "table_count": 46,
+  "sql_calls": 339,
+  "files": [
+    {
+      "file": "backend/app/migrations.py",
+      "sql_calls": 4
+    },
+    {
+      "file": "backend/app/routes/admin.py",
+      "sql_calls": 18
+    },
+    {
+      "file": "backend/app/routes/analytics.py",
+      "sql_calls": 9
+    },
+    {
+      "file": "backend/app/routes/auth.py",
+      "sql_calls": 10
+    },
+    {
+      "file": "backend/app/routes/communication.py",
+      "sql_calls": 32
+    },
+    {
+      "file": "backend/app/routes/email_verification.py",
+      "sql_calls": 6
+    },
+    {
+      "file": "backend/app/routes/estates.py",
+      "sql_calls": 37
+    },
+    {
+      "file": "backend/app/routes/forms.py",
+      "sql_calls": 23
+    },
+    {
+      "file": "backend/app/routes/installments.py",
+      "sql_calls": 21
+    },
+    {
+      "file": "backend/app/routes/maintenance.py",
+      "sql_calls": 20
+    },
+    {
+      "file": "backend/app/routes/notifications.py",
+      "sql_calls": 8
+    },
+    {
+      "file": "backend/app/routes/payments.py",
+      "sql_calls": 21
+    },
+    {
+      "file": "backend/app/routes/public.py",
+      "sql_calls": 3
+    },
+    {
+      "file": "backend/app/routes/reports.py",
+      "sql_calls": 9
+    },
+    {
+      "file": "backend/app/routes/residents.py",
+      "sql_calls": 6
+    },
+    {
+      "file": "backend/app/routes/sales.py",
+      "sql_calls": 24
+    },
+    {
+      "file": "backend/app/routes/saved_listings.py",
+      "sql_calls": 4
+    },
+    {
+      "file": "backend/app/routes/support.py",
+      "sql_calls": 6
+    },
+    {
+      "file": "backend/app/routes/users.py",
+      "sql_calls": 17
+    },
+    {
+      "file": "backend/app/routes/verification.py",
+      "sql_calls": 17
+    },
+    {
+      "file": "backend/app/routes/visitor_passes.py",
+      "sql_calls": 16
+    },
+    {
+      "file": "backend/app/routes/wallet.py",
+      "sql_calls": 13
+    },
+    {
+      "file": "backend/app/seeds.py",
+      "sql_calls": 2
+    },
+    {
+      "file": "backend/app/utils/audit.py",
+      "sql_calls": 1
+    },
+    {
+      "file": "backend/app/utils/authz.py",
+      "sql_calls": 1
+    },
+    {
+      "file": "backend/app/utils/notify.py",
+      "sql_calls": 3
+    },
+    {
+      "file": "backend/app/utils/scope.py",
+      "sql_calls": 6
+    },
+    {
+      "file": "backend/app/utils/settings.py",
+      "sql_calls": 2
+    }
+  ],
+  "runtime_cutover_ready": false
+}

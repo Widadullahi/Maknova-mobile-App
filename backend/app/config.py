@@ -56,7 +56,7 @@ class Config:
 
     # Paystack test keys (client-provided, 2026-08-04). Secret key must never be sent to the mobile app.
     PAYSTACK_PUBLIC_KEY = os.getenv("PAYSTACK_PUBLIC_KEY", "pk_test_768d5db0541db9fd7d088edfc9fc814a1ffc31c0")
-    PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY", "sk_test_317df983d821e300a6283f33df9404db999bb7c5")
+    PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY", "")
     PAYSTACK_BASE_URL = os.getenv("PAYSTACK_BASE_URL", "https://api.paystack.co")
     PLATFORM_COMMISSION_PERCENT = float(os.getenv("PLATFORM_COMMISSION_PERCENT", "2.00"))
     # Paystack split-payment accounts (client directive 11a.1). When the recipient

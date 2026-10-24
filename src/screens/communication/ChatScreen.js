@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Alert, AppState, FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { HugeiconsIcon } from '@hugeicons/react-native';
 import { ArrowLeft02Icon, SentIcon } from '@hugeicons/core-free-icons';
@@ -22,22 +22,32 @@ export function ChatScreen({ navigation, route }) {
   const [draft, setDraft] = useState('');
   const [isSending, setIsSending] = useState(false);
   const listRef = useRef(null);
+  const refreshVersion = useRef(0);
 
-  const loadMessages = useCallback(async () => {
+  const loadMessages = useCallback(async (silent = false) => {
+    const version = ++refreshVersion.current;
     try {
       const data = mode === 'group' ? await fetchGroupMessages(estateId, groupKey) : await fetchConversationMessages(conversationId);
+      if (version !== refreshVersion.current) return;
       setMessages(data.messages || []);
       if (mode === 'conversation') {
         markConversationRead(conversationId).catch(() => null);
       }
     } catch (error) {
-      Alert.alert('Messages', error.message);
+      if (!silent && version === refreshVersion.current) Alert.alert('Messages', error.message);
     }
   }, [mode, conversationId, estateId, groupKey]);
 
   useFocusEffect(
     useCallback(() => {
       loadMessages();
+      const timer = setInterval(() => {
+        if (AppState.currentState === 'active') loadMessages(true);
+      }, 5000);
+      return () => {
+        clearInterval(timer);
+        refreshVersion.current += 1;
+      };
     }, [loadMessages])
   );
 
@@ -47,7 +57,8 @@ export function ChatScreen({ navigation, route }) {
     setIsSending(true);
     try {
       const data = mode === 'group' ? await sendGroupMessage(estateId, groupKey, body) : await sendConversationMessage(conversationId, body);
-      setMessages((current) => [...current, data.message]);
+      refreshVersion.current += 1;
+      setMessages((current) => current.some((message) => String(message.id) === String(data.message.id)) ? current : [...current, data.message]);
       setDraft('');
       requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
     } catch (error) {

@@ -1,0 +1,6 @@
+deps/
+__pycache__/
+.env
+snapshots/
+*.snapshot.json
+.venv/

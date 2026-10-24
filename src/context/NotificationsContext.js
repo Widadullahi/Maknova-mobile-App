@@ -37,6 +37,7 @@ async function ensureAndroidChannel() {
 }
 
 async function requestExpoPushToken() {
+  if (Platform.OS === 'web') return null;
   await ensureAndroidChannel();
 
   const { status } = await Notifications.requestPermissionsAsync();
@@ -108,7 +109,7 @@ export function NotificationsProvider({ children }) {
     }
 
     (async () => {
-      const token = await requestExpoPushToken();
+      const token = await requestExpoPushToken().catch(() => null);
       if (!token || cancelled) return;
       if (registeredTokenRef.current === token) return;
       try {

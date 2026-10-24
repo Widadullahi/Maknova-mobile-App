@@ -1,5 +1,5 @@
 import { fetch as expoFetch } from 'expo/fetch';
-import { File } from 'expo-file-system';
+import { File as ExpoFile } from 'expo-file-system';
 import { Platform } from 'react-native';
 import { refreshAccessToken } from './client';
 import { API_BASE_URL } from '../config/env';
@@ -37,7 +37,7 @@ async function createUploadFile(asset, fallbackName) {
       const response = await fetch(asset.uri);
       const blob = await response.blob();
       const name = normalizeFileName(asset, fallbackName);
-      return { file: new File([blob], name, { type: asset.mimeType || blob.type || 'application/octet-stream' }), name };
+      return { file: new globalThis.File([blob], name, { type: asset.mimeType || blob.type || 'application/octet-stream' }), name };
     }
   }
 
@@ -47,7 +47,7 @@ async function createUploadFile(asset, fallbackName) {
 
   const name = normalizeFileName(asset, fallbackName);
   return {
-    file: new File(asset.uri),
+    file: new ExpoFile(asset.uri),
     name,
   };
 }

@@ -8,7 +8,7 @@
     "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": true,
-      "bundlerIdentifier": "com.maknova.real_estate"
+      "bundleIdentifier": "com.maknova.real_estate"
     },
     "android": {
       "adaptiveIcon": {
