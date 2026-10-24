@@ -39,7 +39,7 @@ SSL_CA="${MYSQL_SSL_CA:-}"
 
 BACKUP_DIR="${BACKUP_DIR:-$BACKEND_DIR/backups}"
 RETENTION_DAYS="${RETENTION_DAYS:-14}"
-OFFSITE_RCLONE_REMOTE="${OFFSITE_RCLONE_REMOTE:-}"   # e.g. "ovhbackup:maknova-backups"
+OFFSITE_RCLONE_REMOTE="${OFFSITE_RCLONE_REMOTE:-}"   # e.g. "s3backup:maknova-backups"
 OFFSITE_SCP_TARGET="${OFFSITE_SCP_TARGET:-}"         # e.g. "user@backuphost:/srv/backups"
 
 mkdir -p "$BACKUP_DIR"

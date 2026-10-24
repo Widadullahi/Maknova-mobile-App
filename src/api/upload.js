@@ -53,6 +53,7 @@ async function createUploadFile(asset, fallbackName) {
 }
 
 async function postMultipart(path, form, token) {
+  if (!API_BASE_URL) throw new Error('Backend URL is not configured. Set EXPO_PUBLIC_API_BASE_URL to the deployed AWS API URL.');
   const response = await expoFetch(`${API_BASE_URL}${path}`, {
     method: 'POST',
     headers: {

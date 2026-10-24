@@ -1,3 +1,5 @@
+> Historical implementation report. For current deployment status and remaining DynamoDB work, see `docs/AWS_HOSTING.md`. No AWS deployment has been performed.
+
 # Project Delivery Report — EstateFlow / Maknova Platform
 **Date:** 7 October 2026 *(updated from the 6 October report — see §0c for what changed since yesterday)*
 **Subject:** Full status report — work completed vs. the previous developer's failed Final Milestone, and what remains
@@ -61,7 +63,7 @@ Work completed in the last day, verified in code:
 
 2. **Video playback is fixed — `expo-video` is installed and used.** Captured plot videos now play back in-app (`VideoView`/`useVideoPlayer` in `src/components/PlotPhotoCapture.js`); the app.json plugin is registered. The 6 Oct note "expo-video not installed" no longer applies.
 
-3. **Hardening defaults improved:** demo accounts (`demo@estate.com`) are disabled by default in production (`DEMO_LOGIN_ENABLED=false`); push dispatch can be disabled per environment; managed-MySQL TLS support (`MYSQL_SSL_CA`) is available for the Aiven migration path.
+3. **Hardening defaults improved:** demo accounts (`demo@estate.com`) are disabled by default in production (`DEMO_LOGIN_ENABLED=false`); push dispatch can be disabled per environment; managed-MySQL TLS support (`MYSQL_SSL_CA`) is available for local legacy development.
 
 ---
 
@@ -137,7 +139,7 @@ The repository is not a mockup or a UI shell. It is a multi-surface product work
 - Auto-migrations (001–019) + seed accounts on backend start
 - Audit trail on sensitive mutations
 - EAS build profiles configured (development / preview / production); Android package `com.maknova.real_estate`; EAS projectId configured (required for push tokens)
-- Production host target baked in: `https://estate.watchup.site/api/v1` (nginx + OVH VPS per backend README)
+- Backend target is configured explicitly through the frontend environment variables; see `docs/AWS_HOSTING.md`.
 
 ---
 
@@ -176,7 +178,7 @@ The repository is not a mockup or a UI shell. It is a multi-surface product work
 |---|--------|
 | **Previous state** | Not integrated / not functioning |
 | **Current code** | **Largely integrated in code:** camera-captured property media with server validation, **in-app video playback (expo-video installed)**, verification document uploads, property documents, private vault download endpoints, web upload fix, wallet/estate flows that depend on uploads. |
-| **Still remaining** | (a) Two mobile screens still fire placeholder alerts instead of using the now-built backend: **ListingDetail** "Opening documents will be connected once storage is configured" and **ReportIssue** "File attachments will be connected once storage is configured"; (b) production upload directories must be confirmed on the VPS (public `/uploads` + private vault dir); (c) multi-role upload smoke tests on live server. |
+| **Still remaining** | (a) Two mobile screens still fire placeholder alerts instead of using the now-built backend: **ListingDetail** "Opening documents will be connected once storage is configured" and **ReportIssue** "File attachments will be connected once storage is configured"; (b) AWS S3 storage and authorized private-file retrieval must be implemented and verified; (c) multi-role upload smoke tests in staging. |
 | **Owner** | Developer: wire the two placeholder screens + live upload tests. |
 
 ### 3.5 App stores — "not deployed and approved on Google Play and Apple App Store"
@@ -203,7 +205,7 @@ These items go beyond the five failed points and strengthen the handoff:
 7. **QR hardening for visitor passes** — signature/expiry/status checks on scan verify; verification log persisted.
 8. **Analytics additions** — pending verifications, suspended estates, subscription revenue on summary.
 9. **Document vault pattern** — private files not publicly listed; authenticated role-checked access for browser viewing.
-10. **Full documentation set** — implementation plan, API contract, change log, code-review findings, client walkthrough, Aiven DB migration runbook.
+10. **Full documentation set** — implementation plan, API contract, change log, code-review findings, client walkthrough, AWS hosting handoff.
 11. **Code review executed** — 8 ranked findings documented (`CODE_REVIEW_FINDINGS.md`); one of them (buyer screens vs mock context) has since been **fixed** — `PropertyDealsContext` now calls the real backend.
 12. **Push notification pipeline** (new, see §0c) — device registration, server dispatch, event triggers, notification-center sync.
 
@@ -219,7 +221,7 @@ These items go beyond the five failed points and strengthen the handoff:
 | High | Wire ListingDetail document-open + message buttons; ReportIssue attachments |
 | High | Security hygiene before go-live: decide on seed accounts in production (`SEED_DEFAULT_ROLE_ACCOUNTS` — demo logins already default off), confirm Flask debug off in production, restrict `CORS_ORIGINS` from `*`, rotate/remove secrets left on disk in the handoff `.env`, complete `.env.example` |
 | High | Redeploy backend so payments, installments, chat, OTP verification, and the **push dispatch service** are live |
-| Medium | Confirm production upload dirs on VPS; smoke-test all core flows on live server (auth → OTP → verification → estate/plot → sale → Paystack → wallet → visitor pass → maintenance → chat → **push to real device** → notifications → forms) |
+| Medium | Implement and verify AWS S3 uploads and private document access; smoke-test all core flows in staging (auth → OTP → verification → estate/plot → sale → Paystack → wallet → visitor pass → maintenance → chat → **push to real device** → notifications → forms) |
 | Medium | Property listing cards still use a placeholder aerial image — surface real camera-captured media in buyer browse |
 
 ### B. Live services & keys (client provides)
@@ -232,9 +234,9 @@ These items go beyond the five failed points and strengthen the handoff:
 | Google **Play Console** account ($25 one-time) | Android store |
 | Apple **Developer Program** ($99/year) | iOS store |
 | Privacy policy text / URL | Both stores + likely Play data-safety form |
-| SMTP production email credentials | OTP verification on live server |
+| SMTP production email credentials | OTP verification in staging |
 
-**Note on "Google Search Console to host it":** Search Console is **not hosting** and **not** Play Store approval. The website/API is already hosted on the VPS (`estate.watchup.site` behind nginx). Search Console is used later for website SEO/verification. Play Store uses **Google Play Console**.
+**Hosting:** AWS deployment is pending. Search Console is for website verification/SEO; Play Store distribution uses Google Play Console.
 
 ### C. App store submission
 
@@ -251,9 +253,9 @@ These items go beyond the five failed points and strengthen the handoff:
 
 ### D. Deployment
 
-- Redeploy Flask backend on the VPS so migrations 001–019 and all blueprints (payments, installments, communication, notifications, push dispatch, wallet, email verification) are live.
+- Complete and validate the DynamoDB backend workflows before deploying the AWS API.
 - No CI/CD in the repo — deploys are currently manual SSH; consider adding a simple deploy script/pipeline later.
-- Optional: move MySQL to Aiven using the delivered runbook (`docs/DATABASE_MIGRATION_AIVEN.md`).
+- Follow the AWS handoff in `docs/AWS_HOSTING.md` and the isolated DynamoDB staging README.
 
 ---
 

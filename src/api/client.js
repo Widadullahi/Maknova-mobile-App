@@ -8,6 +8,7 @@ import { clearTokens, getAccessToken, getRefreshToken, saveTokens } from '../ser
 let refreshInFlight = null;
 
 async function fetchWithTimeout(url, options = {}) {
+  if (!API_BASE_URL) throw new Error('Backend URL is not configured. Set EXPO_PUBLIC_API_BASE_URL to the deployed AWS API URL.');
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 20000);
   try {

@@ -2,7 +2,7 @@
 
 Target region: **eu-west-1**. Status: **data migration tools and authentication prototype; not a complete replacement backend**.
 
-This directory is separate from `Maknova-mobile-App`. No testing process, API URL, database, dashboard, DNS record, or existing account is changed. Do not point the existing apps at `staging_api.py`: most workflows intentionally return `503 MIGRATION_PENDING`.
+This directory is isolated from the active Flask application under `backend/app`. No testing process, API URL, database, dashboard, DNS record, or existing account is changed. Do not point the existing apps at `staging_api.py`: most workflows intentionally return `503 MIGRATION_PENDING`.
 
 ## What is implemented
 

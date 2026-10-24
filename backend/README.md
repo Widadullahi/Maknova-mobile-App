@@ -1,85 +1,28 @@
-# Real Estate API
+# Maknova backend
 
-Custom Flask backend for the Real Estate Management Platform.
+The hosting target is AWS in `eu-west-1`. See [the AWS handoff](../docs/AWS_HOSTING.md).
 
-## Stack
+## Runtime status
 
-- Flask
-- PyMySQL
-- Raw SQL queries with parameter binding
-- MySQL
-- JWT authentication
+`app/` is the existing Flask backend and still contains MySQL queries. It is retained as implementation reference and for local legacy development. It is **not** a completed DynamoDB backend.
 
-## Setup
+`dynamodb-staging/` contains the separate DynamoDB migration tooling and authentication prototype. Its tests use synthetic data. Unported endpoints return `503 MIGRATION_PENDING`. Do not deploy it as the complete application API.
 
-### Local development (Dockerized MySQL)
+The source contains no hosted API default. Configure the real AWS API URL separately in the mobile app and both dashboards after the replacement backend is ready.
 
-This is the setup currently used on the dev machine:
+## Local legacy development
 
-```bash
-# 1. MySQL 8 in Docker (db: real_estate, user: real_estate/real_estate, port 3306 on localhost)
-docker run -d --name maknova-mysql \
-  -e MYSQL_ROOT_PASSWORD=rootpw \
-  -e MYSQL_DATABASE=real_estate \
-  -e MYSQL_USER=real_estate \
-  -e MYSQL_PASSWORD=real_estate \
-  -p 127.0.0.1:3306:3306 mysql:8.0 \
-  --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+1. Install Python packages from `requirements.txt` into a virtual environment.
+2. Copy `.env.example` to `.env` and configure a local development MySQL database.
+3. Set unique local application and JWT secrets.
+4. Run `python run.py`. The local API listens on port 4959; `GET /health` checks HTTP availability.
 
-# 2. Python deps (PEP 668 systems like Ubuntu 24.04 need the override; installs to ~/.local)
-python3 -m pip install --user --break-system-packages -r requirements.txt
+MySQL migrations in `migrations/` belong to the legacy implementation. Default role-account seeding is disabled. Only enable `SEED_DEFAULT_ROLE_ACCOUNTS=true` for a disposable local database. Demo accounts also require explicit `DEMO_LOGIN_ENABLED=true`.
 
-# 3. Environment config
-cp .env.example .env   # then edit; see "Local dev .env notes" below
+## AWS deployment configuration
 
-# 4. Run (migrations 001-019 + demo accounts apply automatically on startup)
-python3 run.py
-```
+The hosting developer must configure DynamoDB access through an AWS role, private file storage in S3, JWT/application secrets through a secret store, an explicit CORS allowlist, verified email delivery, and Paystack backend credentials/webhooks. No cloud resources or gateway keys are provisioned by this repository's configuration examples.
 
-The API listens on http://127.0.0.1:4959. Health check: `GET /health`.
+Set `EMAIL_FROM` to your verified sender. Do not use development OTP-code responses in a hosted environment. Device push requires the Expo/Firebase credentials for the actual Android build and a real device test.
 
-### Local dev .env notes
-
-- `EMAIL_SMTP_*` left empty: OTP emails are **not sent**; the verification endpoint returns
-  the code as `devCode` in the response instead (dev convenience, never enable SMTP-less
-  mode in production).
-- `PAYSTACK_SUBACCOUNT_CODE` / `PAYSTACK_SPLIT_CODE` empty = legacy charge-on-top pricing.
-- Paystack test/public keys fall back to the values in `app/config.py` when unset.
-- `DEMO_LOGIN_ENABLED=true` if you need the seeded demo identities (demo@estate.com /
-  demo1234). It is **off by default** — production must never set it.
-- `EXPO_PUSH_ENABLED=true` (default) enables outbound Expo push dispatch. Set `false`
-  locally if you don't want outbound push calls.
-
-### Production (OVH VPS)
-
-Production `.env` must NOT set `DEMO_LOGIN_ENABLED` (it defaults to off, keeping the
-hardcoded demo accounts unusable). Push notifications require no extra server env — the
-mobile app registers its Expo push token via `POST /notifications/push-token` and the
-server dispatches through the Expo push service; only device/emulator builds with a
-development client can receive pushes (not Expo Go on Android, SDK 53+).
-
-### Production (OVH VPS)
-
-The live backend runs on an OVH VPS (`vps-ca66261d.vps.ovh.net`, Ubuntu + nginx 1.26 reverse
-proxy on `estate.watchup.site`, app port 4959). There is no CI/CD in this repo — deploys are
-manual over SSH. Before redeploying: `mysqldump` the database (migrations run automatically
-on startup, but the new code needs `EMAIL_SMTP_*` and optionally `PAYSTACK_SUBACCOUNT_CODE`/
-`PAYSTACK_SPLIT_CODE` added to the server's `.env`).
-
-Create the database, then apply SQL files in `migrations/` in order.
-
-```sql
-CREATE DATABASE real_estate CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-Run the API:
-
-```bash
-python run.py
-```
-
-Health check:
-
-```txt
-GET http://localhost:4959/health
-```
+The app keeps the `/api/v1` request/response contract during migration. Validate authorization, payments, wallet consistency, chat, uploads, and push before switching any clients to the new API.

@@ -13,7 +13,7 @@ DEFAULT_ROLE_ACCOUNTS = [
     },
     {
         "full_name": "Seed Admin",
-        "email": "admin@estate.watchup.site",
+        "email": "admin@maknova.example",
         "phone": None,
         "role": "admin",
         "password": "admin123",
@@ -21,7 +21,7 @@ DEFAULT_ROLE_ACCOUNTS = [
     },
     {
         "full_name": "Seed Estate Manager",
-        "email": "manager@estate.watchup.site",
+        "email": "manager@maknova.example",
         "phone": None,
         "role": "estate_manager",
         "password": "manager123",
@@ -29,7 +29,7 @@ DEFAULT_ROLE_ACCOUNTS = [
     },
     {
         "full_name": "Seed Resident",
-        "email": "resident@estate.watchup.site",
+        "email": "resident@maknova.example",
         "phone": None,
         "role": "resident",
         "password": "resident123",
@@ -37,7 +37,7 @@ DEFAULT_ROLE_ACCOUNTS = [
     },
     {
         "full_name": "Seed Buyer",
-        "email": "buyer@estate.watchup.site",
+        "email": "buyer@maknova.example",
         "phone": None,
         "role": "buyer",
         "password": "buyer123",
@@ -45,7 +45,7 @@ DEFAULT_ROLE_ACCOUNTS = [
     },
     {
         "full_name": "Seed Security",
-        "email": "security@estate.watchup.site",
+        "email": "security@maknova.example",
         "phone": None,
         "role": "security",
         "password": "security123",
@@ -53,7 +53,7 @@ DEFAULT_ROLE_ACCOUNTS = [
     },
     {
         "full_name": "Seed Public User",
-        "email": "public@estate.watchup.site",
+        "email": "public@maknova.example",
         "phone": None,
         "role": "public_user",
         "password": "public123",

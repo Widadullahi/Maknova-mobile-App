@@ -1,6 +1,9 @@
 node_modules
 
 # Backend secrets & local artifacts — never commit
+.env
+.env.local
+**/.env.local
 backend/.env
 backend/.venv/
 backend/uploads/

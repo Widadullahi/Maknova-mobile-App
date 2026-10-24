@@ -15,9 +15,9 @@ def get_connection():
         autocommit=False,
         connect_timeout=10,
     )
-    # TLS to managed providers (Aiven, RDS, DigitalOcean...). PyMySQL 1.x takes
+    # Legacy SQL TLS connection. PyMySQL 1.x takes
     # ssl as a dict, not individual kwargs. When MYSQL_SSL_CA is empty (local
-    # dev / current VPS) no TLS config is passed and behavior is unchanged.
+    # development) no TLS config is passed and behavior is unchanged.
     ssl_ca = current_app.config.get("MYSQL_SSL_CA")
     if ssl_ca:
         connect_kwargs["ssl"] = {"ca": ssl_ca}

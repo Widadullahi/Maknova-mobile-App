@@ -1,6 +1,7 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://estate.watchup.site/api/v1';
+export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || '').trim().replace(/\/+$/, '');
 
 export async function apiRequest(path, options = {}, token) {
+  if (!API_BASE_URL) throw new Error('Backend URL is not configured. Set NEXT_PUBLIC_API_BASE_URL to the deployed AWS API URL.');
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     headers: {

@@ -26,8 +26,8 @@ class Config:
     MYSQL_USER = os.getenv("MYSQL_USER", "real_estate")
     MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "real_estate")
     MYSQL_DATABASE = os.getenv("MYSQL_DATABASE", "real_estate")
-    # Managed-MySQL TLS (Aiven/RDS/DigitalOcean). Point MYSQL_SSL_CA at the
-    # provider's CA certificate file; empty = no TLS (local/VPS dev unchanged).
+    # Legacy SQL TLS configuration. Point MYSQL_SSL_CA at the
+    # provider's CA certificate file; empty = no TLS (local development unchanged).
     MYSQL_SSL_CA = os.getenv("MYSQL_SSL_CA", "")
     MYSQL_SSL_VERIFY_IDENTITY = os.getenv("MYSQL_SSL_VERIFY_IDENTITY", "false").lower() in ("1", "true", "yes")
     RUN_MIGRATIONS_ON_STARTUP = os.getenv("RUN_MIGRATIONS_ON_STARTUP", "true").lower() in ("1", "true", "yes")
@@ -39,7 +39,7 @@ class Config:
     # mobile app via POST /notifications/push-token. Disable in dev to skip all
     # outbound push calls.
     EXPO_PUSH_ENABLED = os.getenv("EXPO_PUSH_ENABLED", "true").lower() in ("1", "true", "yes")
-    SEED_DEFAULT_ROLE_ACCOUNTS = os.getenv("SEED_DEFAULT_ROLE_ACCOUNTS", "true").lower() in ("1", "true", "yes")
+    SEED_DEFAULT_ROLE_ACCOUNTS = os.getenv("SEED_DEFAULT_ROLE_ACCOUNTS", "false").lower() in ("1", "true", "yes")
     UPLOAD_DIR = os.getenv(
         "UPLOAD_DIR",
         os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads")),
@@ -78,5 +78,5 @@ class Config:
     EMAIL_SMTP_PORT = int(os.getenv("EMAIL_SMTP_PORT", "587"))
     EMAIL_SMTP_USER = os.getenv("EMAIL_SMTP_USER", "")
     EMAIL_SMTP_PASSWORD = os.getenv("EMAIL_SMTP_PASSWORD", "")
-    EMAIL_FROM = os.getenv("EMAIL_FROM", "Maknova Platform <no-reply@watchup.site>")
+    EMAIL_FROM = os.getenv("EMAIL_FROM", "")
     EMAIL_OTP_TTL_MINUTES = int(os.getenv("EMAIL_OTP_TTL_MINUTES", "15"))

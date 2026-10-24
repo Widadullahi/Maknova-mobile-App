@@ -17,7 +17,7 @@ import urllib.error
 import urllib.request
 
 BASE = "http://127.0.0.1:4959/api/v1"
-MANAGER_EMAIL = "manager@estate.watchup.site"
+MANAGER_EMAIL = "manager@maknova.example"
 MANAGER_PASSWORD = "manager123"
 ESTATE_NAME = "Amani Gardens Estate"
 
@@ -207,7 +207,7 @@ def main():
     step("GET public properties (no auth)", status, body, required=False)
     print()
     print(f"IDs -> estate={estate_id} plots={plot_ids} buyers={buyer_ids} sale={sale_id} reservation={reservation_id}")
-    print("Done. Log in on the app as manager@estate.watchup.site / manager123")
+    print("Done. Log in on the app as manager@maknova.example / manager123")
 
 
 if __name__ == "__main__":
